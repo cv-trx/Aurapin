@@ -1936,8 +1936,8 @@ function updateSidebarCounter(){
   const c=document.getElementById('sb-counter');
   const total=herePins.length+nearPins.length;
   c.textContent = total===0
-    ? 'ماكو ملصقات قريبة منك الحين'
-    : '📍 '+total+(total===1?' ملصق قريب منك الحين':' ملصقات قريبة منك الحين');
+    ? 'لا يوجد ملصق قريب منك الآن'
+    : '📍 '+total+(total===1?'ملصق قريب منك الآن':' ملصقات قريبة منك الآن');
 }
 
 /* ── الثيم (ليلي/نهاري/تلقائي) ── */
@@ -1972,7 +1972,7 @@ function openNearbyList(){
   const wrap=document.getElementById('sb-panel-content');
   const combined=[...herePins,...nearPins].sort((a,b)=>a._d-b._d);
   if(!combined.length){
-    wrap.innerHTML='<div class="sb-label" style="margin-top:18px">أماكن الملصقات القريبة</div><div class="sb-list-empty">ماكو ملصقات بنطاقك الحين — تحرّك شوي أو كن أول من يضع ملصق هنا 📍</div>';
+    wrap.innerHTML='<div class="sb-label" style="margin-top:18px">أماكن الملصقات القريبة</div><div class="sb-list-empty">لا يوجد ملصقات بالقرب منك الآن — تحرّك قليلا أو كن أول من يضع ملصق هنا 📍</div>';
     return;
   }
   wrap.innerHTML='<div class="sb-label" style="margin-top:18px">أماكن الملصقات القريبة</div>'+
@@ -1991,7 +1991,7 @@ function openMyPins(){
   const myUid=window._myUid;
   const mine=pins.filter(p=>myUid && p.uid===myUid).sort((a,b)=>(b.ts||0)-(a.ts||0));
   if(!mine.length){
-    wrap.innerHTML='<div class="sb-label" style="margin-top:18px">ملصقاتي</div><div class="sb-list-empty">ماعندك ملصقات لسا — أضف أول ملصق من الشاشة الرئيسية 📍</div>';
+    wrap.innerHTML='<div class="sb-label" style="margin-top:18px">ملصقاتي</div><div class="sb-list-empty">ليست لديك اي ملصقات الى الآن — أضف أول ملصق من الشاشة الرئيسية 📍</div>';
     return;
   }
   wrap.innerHTML='<div class="sb-label" style="margin-top:18px">ملصقاتي ('+mine.length+')</div>'+
@@ -2006,7 +2006,7 @@ function openMyPins(){
 window.openMyPins=openMyPins;
 
 async function deleteMyPin(pinId){
-  if(!confirm('متأكد تبي تحذف هذا الملصق؟'))return;
+  if(!confirm('هل انت متأكد انك تريد حذف الملصق؟'))return;
   try{
     await window._deletePin(pinId);
     toast('✓ تم حذف الملصق','success');
