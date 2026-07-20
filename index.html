@@ -17,82 +17,1087 @@
 </head>
 <body>
 
+
 <div id="splash">
-<div class="splash-anim-wrap">
-<div class="splash-rings">
-<span class="s-ring sr1"></span>
-<span class="s-ring sr2"></span>
-<span class="s-ring sr3"></span>
-<span class="s-ring sr4"></span>
-<span class="s-ring sr5"></span>
-<span class="s-ring sr6"></span>
-</div>
-<svg class="splash-triangle" viewBox="0 0 200 190" xmlns="http://www.w3.org/2000/svg">
-<defs>
-<linearGradient id="splashTriGrad" x1="0" y1="0" x2="0" y2="1">
-<stop offset="0%" stop-color="#ff2a6d"/>
-<stop offset="100%" stop-color="#8b2fe0"/>
-</linearGradient>
-</defs>
-<path d="M100,12 L172,178" stroke="url(#splashTriGrad)" stroke-width="7" stroke-linecap="round" fill="none"/>
-<path d="M100,12 L28,178" stroke="url(#splashTriGrad)" stroke-width="7" stroke-linecap="round" fill="none"/>
-</svg>
-</div>
-<div class="splash-text">
-<div class="splash-logo">AURAPIN</div>
-<div class="splash-tagline">LEAVE TODAY, REMEMBER FOREVER</div>
-</div>
+  <div class="splash-anim-wrap">
+    <div class="splash-rings">
+      <span class="s-ring sr1"></span>
+      <span class="s-ring sr2"></span>
+      <span class="s-ring sr3"></span>
+      <span class="s-ring sr4"></span>
+      <span class="s-ring sr5"></span>
+      <span class="s-ring sr6"></span>
+    </div>
+    <svg class="splash-triangle" viewBox="0 0 200 190" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="splashTriGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#ff2a6d"/>
+          <stop offset="100%" stop-color="#8b2fe0"/>
+        </linearGradient>
+      </defs>
+      <path d="M100,12 L172,178" stroke="url(#splashTriGrad)" stroke-width="7" stroke-linecap="round" fill="none"/>
+      <path d="M100,12 L28,178" stroke="url(#splashTriGrad)" stroke-width="7" stroke-linecap="round" fill="none"/>
+    </svg>
+  </div>
+  <div class="splash-text">
+    <div class="splash-logo">AURAPIN</div>
+    <div class="splash-tagline">LEAVE TODAY, REMEMBER FOREVER</div>
+  </div>
 </div>
 <script>
 // تختفي الـ splash تلقائيًا وتكشف مشهد الشارع تحتها
 setTimeout(function(){
-var sp = document.getElementById('splash');
-if(!sp) return;
-sp.classList.add('hide');
-setTimeout(function(){ sp.style.display='none'; }, 500);
+  var sp = document.getElementById('splash');
+  if(!sp) return;
+  sp.classList.add('hide');
+  setTimeout(function(){ sp.style.display='none'; }, 500);
 }, 2650);
 </script>
 
-<div id="start">
-<div class="sky"></div>
-<div class="stars"></div>
-<div class="moon"></div>
 
-<div class="city">
-<div class="building b1">
-<div class="neon-sign ns-pink" style="top:30px;right:4px">BAR</div>
+<div id="start">
+  <div class="sky"></div>
+  <div class="stars"></div>
+  <div class="moon"></div>
+
+  
+  <div class="city">
+    <div class="building b1">
+      <div class="neon-sign ns-pink" style="top:30px;right:4px">BAR</div>
+    </div>
+    <div class="building b2">
+      <div class="wall-sticker" style="top:60px;left:4px">أنا كنت هنا 2024</div>
+      <div class="neon-sign ns-blue" style="top:20px;right:3px;font-size:7px">OPEN</div>
+    </div>
+    <div class="building b3">
+      <div class="neon-sign ns-yellow" style="top:25px;left:5px;font-size:7px">24H</div>
+    </div>
+    <div class="building b4">
+      <div class="wall-sticker" style="top:80px;right:2px;animation-delay:1s">☕ قهوة ممتازة هنا</div>
+      <div class="neon-sign ns-pink" style="top:40px;left:3px;font-size:7px">CAFE</div>
+    </div>
+    <div class="building b5">
+      <div class="neon-sign ns-blue" style="top:30px;right:5px">SHOP</div>
+      <div class="wall-sticker" style="top:100px;left:3px;animation-delay:2s">مكان جميل 🌙</div>
+    </div>
+    <div class="building b6">
+      <div class="neon-sign ns-yellow" style="top:50px;left:4px;font-size:7px">HOTEL</div>
+    </div>
+    <div class="building b7">
+      <div class="wall-sticker" style="top:40px;right:3px;animation-delay:.5s">اجتمعنا هنا 👥</div>
+    </div>
+    <div class="building b8">
+      <div class="neon-sign ns-pink" style="top:60px;right:3px;font-size:7px">FOOD</div>
+      <div class="wall-sticker" style="top:140px;left:2px;animation-delay:1.5s">أفضل مكان في الحي</div>
+    </div>
+    <div class="building b9">
+      <div class="neon-sign ns-blue" style="top:35px;left:5px">ART</div>
+    </div>
+    <div class="building b10">
+      <div class="neon-sign ns-yellow" style="top:45px;right:3px;font-size:7px">GYM</div>
+    </div>
+  </div>
+
+  
+  <div class="street-section">
+    <div class="sidewalk"></div>
+
+    
+    <div class="lamp" style="left:20%;height:60px;bottom:68%;">
+      <div class="lamp-head"></div>
+      <div class="lamp-light"></div>
+    </div>
+    <div class="lamp" style="left:65%;height:60px;bottom:68%;">
+      <div class="lamp-head"></div>
+      <div class="lamp-light"></div>
+    </div>
+
+    
+    <div class="ground-sticker" style="left:8%;">تقابلنا هنا أول مرة ❤️</div>
+    <div class="ground-sticker" style="left:52%;animation-delay:1.5s">حادثة مضحكة هنا 😂</div>
+
+    <div class="asphalt"></div>
+
+    
+    <div class="road-lines">
+      <div class="road-line"></div><div class="road-line"></div>
+      <div class="road-line"></div><div class="road-line"></div>
+      <div class="road-line"></div><div class="road-line"></div>
+      <div class="road-line"></div><div class="road-line"></div>
+      <div class="road-line"></div><div class="road-line"></div>
+      <div class="road-line"></div><div class="road-line"></div>
+    </div>
+  </div>
+
+  
+  <div class="sticker-strip">
+    <div class="sticker-track">
+      <div class="strip-item"><div class="strip-dot"></div>أفضل مطعم في الحي</div>
+      <div class="strip-item"><div class="strip-dot"></div>تقابلنا هنا ❤️</div>
+      <div class="strip-item"><div class="strip-dot"></div>مكان سري 🤫</div>
+      <div class="strip-item"><div class="strip-dot"></div>كنت هنا 2023</div>
+      <div class="strip-item"><div class="strip-dot"></div>اكتشفته بالصدفة</div>
+      <div class="strip-item"><div class="strip-dot"></div>أجمل غروب شمس</div>
+      <div class="strip-item"><div class="strip-dot"></div>أفضل مطعم في الحي</div>
+      <div class="strip-item"><div class="strip-dot"></div>تقابلنا هنا ❤️</div>
+      <div class="strip-item"><div class="strip-dot"></div>مكان سري 🤫</div>
+      <div class="strip-item"><div class="strip-dot"></div>كنت هنا 2023</div>
+      <div class="strip-item"><div class="strip-dot"></div>اكتشفته بالصدفة</div>
+      <div class="strip-item"><div class="strip-dot"></div>أجمل غروب شمس</div>
+    </div>
+  </div>
+
+  <div class="fog"></div>
+
+  
+  <div class="start-logo">
+    <div class="logo-glow">AURAPIN</div>
+    <div class="logo-sub">ملصقاتك على العالم الحقيقي</div>
+    <button class="start-cta" onclick="boot()">ابدأ التجربة</button>
+    <div class="start-note">يحتاج كاميرا + موقع GPS</div>
+  </div>
+
+  <div class="bottom-fade"></div>
 </div>
-<div class="building b2">
-<div class="wall-sticker" style="top:60px;left:4px">أنا كنت هنا 2024</div>
-<div class="neon-sign ns-blue" style="top:20px;right:3px;font-size:7px">OPEN</div>
+
+
+<div id="app">
+  <video id="cam" autoplay playsinline muted></video>
+  <div id="ar-layer"></div>
+
+  <div id="hud">
+    <div id="hamburger-btn" onclick="openSidebar()"><span></span></div>
+    <div id="hud-logo">AURAPIN</div>
+    <div id="gps-wrap">
+      <div id="gps-row">
+        <div id="gps-led"></div>
+        <span id="gps-txt">جاري التحديد...</span>
+      </div>
+      <span id="acc-txt"></span>
+    </div>
+  </div>
+
+  <div id="meter">
+    <div id="meter-ring">
+      <svg viewBox="0 0 60 60" fill="none">
+        <circle cx="30" cy="30" r="28" stroke="rgba(255,255,255,0.06)" stroke-width="1.5"/>
+        <circle id="meter-arc" cx="30" cy="30" r="28"
+          stroke="rgba(255,42,109,0.0)" stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-dasharray="176" stroke-dashoffset="176"
+          transform="rotate(-90 30 30)"/>
+      </svg>
+      <div id="meter-num">--<br><span style="font-size:8px">م</span></div>
+    </div>
+    <span id="meter-lbl">لا ملصقات</span>
+  </div>
+
+  <div id="prox">
+    <div id="prox-arrow-wrap"><div id="prox-arrow"></div></div>
+    <span id="prox-label">ملصق قريب!</span>
+    <button id="compass-permit" style="display:none" onclick="requestCompass()">فعّل البوصلة للتوجيه</button>
+  </div>
+
+  <div id="reveal">
+    <div id="reveal-card">
+      <div id="reveal-close" onclick="closeReveal()">✕</div>
+      <div id="reveal-pin">📍</div>
+      <div id="reveal-badge">1</div>
+      <div id="reveal-text">...</div>
+      <img id="reveal-photo" src="" alt="صورة الملصق"/>
+      <div id="reveal-meta"></div>
+      <div id="reveal-nav" style="display:none">
+        <button class="rnav" onclick="prevPin()">→ السابق</button>
+        <button class="rnav" onclick="nextPin()">التالي ←</button>
+      </div>
+      <button id="del-btn" class="rnav" style="display:none;margin-top:8px;color:rgba(255,80,80,.7);border-color:rgba(255,80,80,.25)" onclick="deletePin()">🗑 حذف ملصقي</button>
+    </div>
+  </div>
+
+  <div id="panel">
+    
+    <div id="view-idle" class="panel-view show">
+      <button id="add-btn" onclick="openTypeSelect()">
+        <span class="plus-icon">＋</span>
+        <span class="spinner"></span>
+      </button>
+      <div id="status">اضغط ＋ لتثبيت ملصق في موقعك</div>
+    </div>
+
+    
+    <div id="view-type" class="panel-view">
+      <div class="type-row">
+        <button class="type-btn" onclick="chooseText()"><span class="ic">📝</span>نص</button>
+        <button class="type-btn" onclick="choosePhotoSource()"><span class="ic">📷</span>صورة</button>
+      </div>
+      <button class="panel-cancel" onclick="backToIdle()">إلغاء</button>
+    </div>
+
+    
+    <div id="view-text" class="panel-view">
+      <div id="input-row">
+        <button id="add-btn-text" class="round-btn" onclick="saveTextPin()">
+          <span class="plus-icon">✓</span>
+          <span class="spinner"></span>
+        </button>
+        <input id="txt" type="text" placeholder="اكتب ملصقك..." maxlength="120"
+          onkeydown="if(event.key==='Enter')saveTextPin()"/>
+      </div>
+      <button class="panel-back" onclick="backToTypeSelect()">→ رجوع</button>
+    </div>
+
+    
+    <div id="view-photo-source" class="panel-view">
+      <div class="type-row">
+        <button class="type-btn" onclick="triggerCamera()"><span class="ic">📸</span>التقط صورة</button>
+        <button class="type-btn" onclick="triggerGallery()"><span class="ic">🖼️</span>من المعرض</button>
+      </div>
+      <button class="panel-back" onclick="backToTypeSelect()">→ رجوع</button>
+      <input type="file" id="file-camera" accept="image/*" capture="environment" style="display:none" onchange="onFileSelected(event)"/>
+      <input type="file" id="file-gallery" accept="image/*" style="display:none" onchange="onFileSelected(event)"/>
+    </div>
+
+    
+    <div id="view-photo-preview" class="panel-view">
+      <div id="photo-preview-wrap"><img id="photo-preview-img" src="" alt=""/></div>
+      <input id="photo-caption" type="text" placeholder="أضف وصف (اختياري)..." maxlength="120"/>
+      <div id="photo-actions">
+        <button class="panel-back" onclick="backToPhotoSource()">→ رجوع</button>
+        <button id="add-btn-photo" onclick="savePhotoPin()">
+          <span class="plus-icon">✓ حفظ الملصق</span>
+          <span class="spinner"></span>
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
-<div class="building b3">
-<div class="neon-sign ns-yellow" style="top:25px;left:5px;font-size:7px">24H</div>
+
+<div id="toast"></div>
+
+
+<div id="sidebar-overlay" onclick="closeSidebar()"></div>
+<div id="sidebar">
+  <div class="sb-close" onclick="closeSidebar()">✕</div>
+  <div class="sb-title">AURAPIN</div>
+  <div class="sb-sub">ملصقاتك على العالم الحقيقي</div>
+
+  <div class="sb-counter" id="sb-counter">— جاري الحساب —</div>
+
+  <div class="sb-section" id="sb-account-section">
+    <div class="sb-label">الحساب</div>
+    <div class="sb-item" id="sb-account-item" onclick="handleAccountClick()">
+      <span class="ic" id="sb-account-ic">🔐</span>
+      <span id="sb-account-text">سجّل دخولك بجوجل لتحفظ ملصقاتك</span>
+    </div>
+  </div>
+
+  <div class="sb-section">
+    <div class="sb-label">استكشاف</div>
+    <div class="sb-item" onclick="openNearbyList()">
+      <span class="ic">🗺️</span> أماكن الملصقات القريبة
+    </div>
+    <div class="sb-item" onclick="openMyPins()">
+      <span class="ic">📍</span> ملصقاتي
+    </div>
+    <div class="sb-item" onclick="shareApp()">
+      <span class="ic">🔗</span> شارك التطبيق
+    </div>
+  </div>
+
+  <div class="sb-section">
+    <div class="sb-label">المظهر</div>
+    <div class="sb-theme-row">
+      <div class="sb-theme-btn" id="theme-auto" onclick="setTheme('auto')">تلقائي</div>
+      <div class="sb-theme-btn" id="theme-dark" onclick="setTheme('dark')">ليلي</div>
+      <div class="sb-theme-btn" id="theme-light" onclick="setTheme('light')">نهاري</div>
+    </div>
+  </div>
+
+  <div class="sb-section">
+    <div class="sb-label">أخرى</div>
+    <div class="sb-item" onclick="contactSupport()">
+      <span class="ic">💬</span> تواصل مع الدعم
+    </div>
+    <div class="sb-item" onclick="showAbout()">
+      <span class="ic">ℹ️</span> عن AuraPin
+    </div>
+  </div>
+
+  <div id="sb-panel-content"></div>
 </div>
-<div class="building b4">
-<div class="wall-sticker" style="top:80px;right:2px;animation-delay:1s">☕ قهوة ممتازة هنا</div>
-<div class="neon-sign ns-pink" style="top:40px;left:3px;font-size:7px">CAFE</div>
-</div>
-<div class="building b5">
-<div class="neon-sign ns-blue" style="top:30px;right:5px">SHOP</div>
-<div class="wall-sticker" style="top:100px;left:3px;animation-delay:2s">مكان جميل 🌙</div>
-</div>
-<div class="building b6">
-<div class="neon-sign ns-yellow" style="top:50px;left:4px;font-size:7px">HOTEL</div>
-</div>
-<div class="building b7">
-<div class="wall-sticker" style="top:40px;right:3px;animation-delay:.5s">اجتمعنا هنا 👥</div>
-</div>
-<div class="building b8">
-<div class="neon-sign ns-pink" style="top:60px;right:3px;font-size:7px">FOOD</div>
-<div class="wall-sticker" style="top:140px;left:2px;animation-delay:1.5s">أفضل مكان في الحي</div>
-</div>
-<div class="building b9">
-<div class="neon-sign ns-blue" style="top:35px;left:5px">ART</div>
-</div>
-<div class="building b10">
-<div class="neon-sign ns-yellow" style="top:45px;right:3px;font-size:7px">GYM</div>
-</div>
+
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+import { getAuth, signInAnonymously, onAuthStateChanged, GoogleAuthProvider, linkWithRedirect, signInWithRedirect, getRedirectResult, signOut } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+const app = initializeApp({
+  apiKey:"AIzaSyCq0EQ9Rw1ea5UXVlVU0BoULs7XMcigJ7M",
+  authDomain:"aurapin-cv-trx.firebaseapp.com",
+  projectId:"aurapin-cv-trx",
+  storageBucket:"aurapin-cv-trx.firebasestorage.app",
+  messagingSenderId:"862864685862",
+  appId:"1:862864685862:web:825dfaf5a070bb46715fe7"
+});
+const db=getFirestore(app);
+const auth=getAuth(app);
+const col=collection(db,"pins");
+
+let currentUserId=null;
+
+onAuthStateChanged(auth,(user)=>{
+  if(user){
+    currentUserId=user.uid;
+    window._fbReady=true;
+    window._myUid=user.uid;
+    window._isAnon=user.isAnonymous;
+    window._userLabel = user.isAnonymous ? null : (user.displayName || user.email || 'مستخدم');
+    if(window._onAuthUpdate) window._onAuthUpdate();
+  }
+});
+
+signInAnonymously(auth).catch((e)=>console.error("Auth error:",e));
+
+window._addPin=(d)=>addDoc(col,{...d,uid:currentUserId});
+window._listen=(cb)=>onSnapshot(col,s=>cb(s.docs.map(d=>({id:d.id,...d.data()}))));
+window._deletePin=(pinId)=>deleteDoc(doc(db,"pins",pinId));
+
+// تسجيل الدخول بجوجل عبر إعادة توجيه (redirect) — أوثق بكثير من النافذة المنبثقة على متصفحات الجوال
+window._signInGoogle=async()=>{
+  const provider=new GoogleAuthProvider();
+  await linkWithRedirect(auth.currentUser, provider);
+  // الصفحة بتنتقل لجوجل الحين وترجع بعدها — النتيجة تُعالج تحت بـ getRedirectResult
+};
+
+// نتحقق أول ما تفتح الصفحة إذا كانت راجعة من تسجيل دخول بجوجل
+getRedirectResult(auth).then((result)=>{
+  if(result && window._onAuthUpdate){
+    if(window._toastAfterRedirect) window._toastAfterRedirect('✓ تم ربط حسابك! ملصقاتك محفوظة الآن','success');
+  }
+}).catch((e)=>{
+  if(e.code==='auth/credential-already-in-use'){
+    // هذا الحساب بجوجل مربوط بحساب فايربيس ثاني من قبل (جهاز/متصفح آخر) —
+    // نسجل دخول عليه مباشرة بنفس بيانات جوجل؛ ملصقات الجلسة الحالية (المجهولة) ما تنتقل له تلقائيًا
+    const cred=GoogleAuthProvider.credentialFromError(e);
+    if(cred) signInWithRedirect(auth, new GoogleAuthProvider());
+  } else if(e.code && e.code!=='auth/no-auth-event' && window._toastAfterRedirect){
+    window._toastAfterRedirect('⚠ تعذّر تسجيل الدخول بجوجل','error');
+  }
+});
+
+window._signOutGoogle=async()=>{
+  await signOut(auth);
+  await signInAnonymously(auth); // نرجع فورًا لحساب مجهول جديد عشان التطبيق يفضل شغال
+};
+</script>
+
+<script>let lat=null,lng=null,gpsOk=false,curAcc=999;
+let pins=[],nearPins=[],herePins=[],idx=0;
+let HERE=20,NEAR=80;
+let myHeading=null,compassOk=false;
+let lastHereShown=false,lastNearShown=false;
+let isSaving=false;
+let arrowRotation=0;
+let currentTheme='auto';
+let arElements={};
+let lastARUpdateTs=0;
+let openPinId=null;
+let arHeading=null;
+let arFrozenUntil=0;
+let camStream=null;
+async function startCamera(){
+try{
+const s=await navigator.mediaDevices.getUserMedia({
+video:{facingMode:'environment',width:{ideal:1920}}
+}).catch(()=>navigator.mediaDevices.getUserMedia({video:true}));
+camStream=s;
+document.getElementById('cam').srcObject=s;
+}catch(e){toast('⚠ تعذّر فتح الكاميرا');}
+}
+document.addEventListener('visibilitychange', () => {
+if(document.visibilityState !== 'visible') return;
+const appShown = document.getElementById('app').classList.contains('show');
+if(!appShown) return;
+const dead = !camStream || camStream.getVideoTracks().every(t => t.readyState === 'ended');
+if(dead) startCamera();
+});
+async function boot(){
+document.getElementById('start').classList.add('gone');
+document.getElementById('app').classList.add('show');
+await startCamera();
+document.getElementById('gps-led').className='wait';
+function onGpsUpdate(p) {
+lat = p.coords.latitude;
+lng = p.coords.longitude;
+curAcc = p.coords.accuracy;
+gpsOk = true;
+const acc = Math.round(p.coords.accuracy);
+document.getElementById('gps-led').className = 'on';
+document.getElementById('acc-txt').textContent = '±' + acc + 'م';
+document.getElementById('gps-txt').textContent =
+acc <= 20 ? 'GPS دقيق ✓' : acc <= 50 ? 'GPS جيد ✓' : 'دقة ضعيفة — قرّب لمكان مفتوح';
+tick();
+}
+navigator.geolocation?.getCurrentPosition(onGpsUpdate, ()=>{}, {
+enableHighAccuracy: false,
+maximumAge: 60000,
+timeout: 4000
+});
+navigator.geolocation?.watchPosition(onGpsUpdate,
+()=>{ if(!gpsOk) document.getElementById('gps-txt').textContent='لا GPS'; },
+{ enableHighAccuracy: true, maximumAge: 5000, timeout: 20000 }
+);
+setupCompass();
+setTimeout(()=>{
+if(!gpsOk){
+document.getElementById('gps-txt').textContent='فعّل GPS يدوياً';
+toast('⚠ فعّل GPS من إعدادات الجهاز');
+}
+}, 8000);
+let t=0;
+const w=setInterval(()=>{
+if(window._fbReady){clearInterval(w);window._listen(p=>{pins=p;tick();});}
+if(++t>80)clearInterval(w);
+},100);
+setInterval(tick,2500);
+}
+window.boot=boot;
+function setupCompass(){
+if(typeof DeviceOrientationEvent === 'undefined') return;
+if(typeof DeviceOrientationEvent.requestPermission === 'function'){
+document.getElementById('compass-permit').style.display='inline-block';
+} else {
+window.addEventListener('deviceorientationabsolute', onOrient, true);
+window.addEventListener('deviceorientation', onOrient, true);
+}
+}
+function requestCompass(){
+DeviceOrientationEvent.requestPermission().then(r=>{
+if(r==='granted'){
+window.addEventListener('deviceorientation', onOrient, true);
+document.getElementById('compass-permit').style.display='none';
+} else {
+toast('⚠ ما قدرنا نفعّل البوصلة');
+}
+}).catch(()=>toast('⚠ خطأ بتفعيل البوصلة'));
+}
+window.requestCompass=requestCompass;
+function onOrient(e){
+let deg = e.alpha;
+if(e.webkitCompassHeading !== undefined) deg = e.webkitCompassHeading;
+if(deg === null || deg === undefined) return;
+if(myHeading === null){
+myHeading = deg;
+arHeading = deg;
+} else {
+let diff = ((deg - myHeading + 540) % 360) - 180;
+myHeading = (myHeading + diff * 0.18 + 360) % 360;
+let arDiff = ((deg - arHeading + 540) % 360) - 180;
+arHeading = (arHeading + arDiff * 0.06 + 360) % 360;
+}
+compassOk = true;
+if(nearPins.length) updateArrow();
+if(nearPins.length || herePins.length) updateARLayer();
+}
+function bearing(lat1,lng1,lat2,lng2){
+const r=Math.PI/180;
+const y=Math.sin((lng2-lng1)*r)*Math.cos(lat2*r);
+const x=Math.cos(lat1*r)*Math.sin(lat2*r)-Math.sin(lat1*r)*Math.cos(lat2*r)*Math.cos((lng2-lng1)*r);
+return (Math.atan2(y,x)*180/Math.PI+360)%360;
+}
+function tick(){
+if(!gpsOk)return;
+HERE = Math.max(20, curAcc * 1.5);
+NEAR = HERE * 4;
+nearPins=[];herePins=[];
+let minRelevant=Infinity;
+pins.forEach(p=>{
+const d=dist(lat,lng,p.lat,p.lng);
+p._d=d;
+if(d<=HERE)herePins.push(p);
+else if(d<=NEAR)nearPins.push(p);
+if(d<=NEAR && d<minRelevant)minRelevant=d;
+});
+herePins.sort((a,b)=>a._d-b._d);
+nearPins.sort((a,b)=>a._d-b._d);
+updateMeter(minRelevant<Infinity?minRelevant:null);
+const showNear = nearPins.length>0;
+lastNearShown = showNear;
+document.getElementById('prox').classList.toggle('show', showNear);
+if(showNear) updateArrow();
+if(showNear || herePins.length){ updateARLayer(); }
+else { document.getElementById('ar-layer').innerHTML=''; arElements={}; }
+if(openPinId){
+const openedPin = pins.find(x=>x.id===openPinId);
+if(!openedPin || openedPin._d > NEAR){
+closeReveal();
+} else {
+refreshReveal();
+}
+}
+document.getElementById('status').textContent=
+pins.length===0?'كن أول من يضع ملصقاً!':
+pins.length===1?'ملصق واحد في العالم':
+pins.length+' ملصق في العالم';
+if(typeof sidebarOpen!=='undefined' && sidebarOpen) updateSidebarCounter();
+}
+function lerpColor(c1,c2,t){
+return [0,1,2].map(i=>Math.round(c1[i]+(c2[i]-c1[i])*t));
+}
+const AMBER_RGB=[255,179,0], NEON_RGB=[255,42,109], HERE_RGB=[0,255,136];
+function updateArrow(){
+const target=nearPins[0];
+document.getElementById('prox-label').textContent=
+'📍 '+nearPins.length+(nearPins.length>1?' ملصقات قريبة':' ملصق قريب')+' — '+Math.round(target._d)+'م';
+const arrow=document.getElementById('prox-arrow');
+const t=Math.max(0,Math.min(1, 1-(target._d-HERE)/(NEAR-HERE)));
+const col=lerpColor(AMBER_RGB,NEON_RGB,t);
+arrow.style.borderBottomColor=`rgb(${col.join(',')})`;
+arrow.style.filter=`drop-shadow(0 0 ${8+t*16}px rgba(${col.join(',')},${0.55+t*0.35}))`;
+if(compassOk && myHeading!==null){
+arrow.style.opacity='1';
+const b=bearing(lat,lng,target.lat,target.lng);
+const targetDeg=(b-myHeading+360)%360;
+let diff=((targetDeg-arrowRotation)%360+540)%360-180;
+arrowRotation+=diff;
+arrow.style.transform=`rotate(${arrowRotation}deg)`;
+} else {
+arrow.style.opacity='.5';
+arrow.style.transform=`rotate(${arrowRotation}deg)`;
+}
+}
+document.getElementById('ar-layer').addEventListener('pointerdown', ()=>{
+arFrozenUntil = performance.now() + 700;
+}, {passive:true});
+function updateARLayer(){
+const layer=document.getElementById('ar-layer');
+const combined=[...herePins,...nearPins];
+if(!combined.length || !compassOk || arHeading===null){
+layer.innerHTML='';
+arElements={};
+return;
+}
+if(performance.now() < arFrozenUntil) return;
+const now=performance.now();
+if(now-lastARUpdateTs<150) return;
+lastARUpdateTs=now;
+const hereIds=new Set(herePins.map(p=>p.id));
+const FOV=32;
+const visible=[];
+combined.forEach(p=>{
+const b=bearing(lat,lng,p.lat,p.lng);
+const diff=((b-arHeading+540)%360)-180;
+if(Math.abs(diff)<=FOV) visible.push({pin:p,diff});
+});
+visible.sort((a,b)=>a.diff-b.diff);
+visible.forEach(v=>v.showLabel=true);
+for(let i=0;i<visible.length;i++){
+for(let j=0;j<i;j++){
+if(visible[j].showLabel && Math.abs(visible[i].diff-visible[j].diff)<4){
+if(visible[i].pin._d < visible[j].pin._d) visible[j].showLabel=false;
+else visible[i].showLabel=false;
+}
+}
+}
+const visibleIds=new Set(visible.map(v=>v.pin.id));
+Object.keys(arElements).forEach(id=>{
+if(!visibleIds.has(id)){ arElements[id].remove(); delete arElements[id]; }
+});
+visible.forEach(v=>{
+const p=v.pin;
+const leftPct=50 + (v.diff/FOV)*38;
+const isHere=hereIds.has(p.id);
+const t=Math.max(0,Math.min(1, 1-(p._d-HERE)/(NEAR-HERE)));
+const col = isHere ? HERE_RGB : lerpColor(AMBER_RGB,NEON_RGB,t);
+let el=arElements[p.id];
+if(!el){
+el=document.createElement('div');
+el.className='ar-icon';
+el.innerHTML='<div class="ar-dot"></div><div class="ar-label"></div><div class="ar-preview"></div>';
+layer.appendChild(el);
+arElements[p.id]=el;
+}
+el.onclick=()=>openPin(p.id);
+el.style.left=leftPct+'%';
+const dot=el.querySelector('.ar-dot');
+dot.style.borderColor=`rgb(${col.join(',')})`;
+dot.style.boxShadow=`0 0 ${isHere?20:10+t*14}px rgba(${col.join(',')},${isHere?0.85:0.5+t*0.4})`;
+const lbl=el.querySelector('.ar-label');
+lbl.style.color=`rgb(${col.join(',')})`;
+lbl.textContent = isHere ? 'وصلت هنا 🎯' : Math.round(p._d)+'م';
+const prev=el.querySelector('.ar-preview');
+if(v.showLabel){
+prev.style.display='block';
+const cap=(p.text||'').slice(0,18);
+prev.textContent = p.photoUrl ? ('📷 '+escHtml(cap||'صورة')) : escHtml(cap);
+} else {
+prev.style.display='none';
+}
+});
+}
+function openPin(pinId){
+openPinId = pinId;
+document.getElementById('reveal').classList.add('show');
+refreshReveal();
+}
+window.openPin = openPin;
+function closeReveal(){
+openPinId = null;
+document.getElementById('reveal').classList.remove('show');
+}
+window.closeReveal = closeReveal;
+function refreshReveal(){
+if(!openPinId) return;
+const hIdx = herePins.findIndex(x=>x.id===openPinId);
+let p, showNav=false, badgeText='📍';
+if(hIdx !== -1){
+p = herePins[hIdx];
+idx = hIdx;
+showNav = herePins.length>1;
+badgeText = showNav ? (idx+1)+'/'+herePins.length : '📍';
+} else {
+p = pins.find(x=>x.id===openPinId);
+if(!p){ closeReveal(); return; }
+}
+document.getElementById('reveal-text').textContent=escHtml(p.text||'');
+document.getElementById('reveal-text').style.display=p.text?'block':'none';
+const photoEl=document.getElementById('reveal-photo');
+if(p.photoUrl){
+photoEl.src=p.photoUrl;
+photoEl.style.display='block';
+}else{
+photoEl.style.display='none';
+photoEl.removeAttribute('src');
+}
+document.getElementById('reveal-meta').textContent=(p._d!=null?Math.round(p._d)+'م • ':'')+ago(p.ts);
+document.getElementById('reveal-badge').textContent=badgeText;
+document.getElementById('reveal-nav').style.display=showNav?'flex':'none';
+const delBtn=document.getElementById('del-btn');
+const isMine = window._myUid && p.uid === window._myUid;
+delBtn.style.display = isMine ? 'inline-block' : 'none';
+}
+async function deletePin(){
+if(!openPinId)return;
+const p = pins.find(x=>x.id===openPinId);
+if(!p)return;
+if(!window._myUid || p.uid !== window._myUid) return toast('هذا مو ملصقك','error');
+if(!confirm('متأكد تبي تحذف هذا الملصق؟')) return;
+try{
+await window._deletePin(p.id);
+toast('✓ تم حذف الملصق','success');
+closeReveal();
+}catch(e){ toast('⚠ خطأ بالحذف: '+e.message,'error'); }
+}
+window.deletePin=deletePin;
+function nextPin(){
+if(!herePins.length)return;
+idx=(idx+1)%herePins.length;
+openPinId=herePins[idx].id;
+refreshReveal();
+}
+function prevPin(){
+if(!herePins.length)return;
+idx=(idx-1+herePins.length)%herePins.length;
+openPinId=herePins[idx].id;
+refreshReveal();
+}
+window.nextPin=nextPin;window.prevPin=prevPin;
+function updateMeter(d){
+const meterEl=document.getElementById('meter');
+const arc=document.getElementById('meter-arc');
+const num=document.getElementById('meter-num');
+const lbl=document.getElementById('meter-lbl');
+if(d===null){
+meterEl.classList.remove('show');
+return;
+}
+meterEl.classList.add('show');
+num.innerHTML=Math.round(d)+'<br><span style="font-size:8px">م</span>';
+if(d<=HERE){
+arc.style.stroke='rgba(0,255,136,0.8)';
+arc.setAttribute('stroke-dashoffset','0');
+lbl.textContent='أنت هنا! 🎯';
+} else if(d<=NEAR){
+const r=1-(d-HERE)/(NEAR-HERE);
+arc.style.stroke=`rgba(255,179,0,${.4+r*.5})`;
+arc.setAttribute('stroke-dashoffset',String(176*(1-r)));
+lbl.textContent='اقترب أكثر';
+} else {
+arc.style.stroke='rgba(255,42,109,0.2)';
+arc.setAttribute('stroke-dashoffset','160');
+lbl.textContent='ابحث عن ملصق';
+}
+}
+let addFlowFile=null;
+function showPanelView(id){
+document.querySelectorAll('.panel-view').forEach(v=>v.classList.remove('show'));
+document.getElementById(id).classList.add('show');
+}
+function openTypeSelect(){ showPanelView('view-type'); }
+window.openTypeSelect=openTypeSelect;
+function backToIdle(){
+document.getElementById('txt').value='';
+document.getElementById('photo-caption').value='';
+addFlowFile=null;
+showPanelView('view-idle');
+}
+window.backToIdle=backToIdle;
+function chooseText(){
+showPanelView('view-text');
+document.getElementById('txt').focus();
+}
+window.chooseText=chooseText;
+function backToTypeSelect(){ showPanelView('view-type'); }
+window.backToTypeSelect=backToTypeSelect;
+function choosePhotoSource(){ showPanelView('view-photo-source'); }
+window.choosePhotoSource=choosePhotoSource;
+function triggerCamera(){ document.getElementById('file-camera').click(); }
+window.triggerCamera=triggerCamera;
+function triggerGallery(){ document.getElementById('file-gallery').click(); }
+window.triggerGallery=triggerGallery;
+function backToPhotoSource(){
+addFlowFile=null;
+document.getElementById('photo-caption').value='';
+showPanelView('view-photo-source');
+}
+window.backToPhotoSource=backToPhotoSource;
+async function onFileSelected(e){
+const file=e.target.files && e.target.files[0];
+e.target.value='';
+if(!file) return;
+if(!file.type.startsWith('image/')) return toast('اختر ملف صورة فقط','error');
+try{
+const compressed=await compressImage(file);
+addFlowFile=compressed;
+document.getElementById('photo-preview-img').src=URL.createObjectURL(compressed);
+showPanelView('view-photo-preview');
+}catch(err){
+toast('⚠ تعذّر معالجة الصورة','error');
+}
+}
+window.onFileSelected=onFileSelected;
+function compressImage(file){
+return new Promise((resolve,reject)=>{
+const img=new Image();
+const reader=new FileReader();
+reader.onload=()=>{ img.src=reader.result; };
+reader.onerror=reject;
+img.onload=()=>{
+const maxDim=1280;
+let w=img.width,h=img.height;
+if(w>h && w>maxDim){ h=Math.round(h*maxDim/w); w=maxDim; }
+else if(h>maxDim){ w=Math.round(w*maxDim/h); h=maxDim; }
+const canvas=document.createElement('canvas');
+canvas.width=w;canvas.height=h;
+canvas.getContext('2d').drawImage(img,0,0,w,h);
+canvas.toBlob(blob=>{
+if(blob) resolve(blob); else reject(new Error('compress failed'));
+},'image/jpeg',0.75);
+};
+img.onerror=reject;
+reader.readAsDataURL(file);
+});
+}
+const CLOUDINARY_CLOUD_NAME='ix7jxz6r';
+const CLOUDINARY_UPLOAD_PRESET='Aurapin';
+async function uploadPhotoToCloudinary(blob){
+const formData=new FormData();
+formData.append('file', blob);
+formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+const res=await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,{
+method:'POST',
+body:formData
+});
+if(!res.ok){
+let msg='فشل رفع الصورة';
+try{ const err=await res.json(); if(err?.error?.message) msg=err.error.message; }catch(e){}
+throw new Error(msg);
+}
+const data=await res.json();
+return data.secure_url;
+}
+async /**
+ * التحقق من حدود المستخدم قبل إضافة ملصق جديد.
+ * يمنع إرسال البيانات بكثرة (الحدّ من السبام).
+ * يتحقق من:
+ * 1. المدة بين كل ملصق وآخر (30 ثانية).
+ * 2. عدد الملصقات في الساعة الأخيرة (10 ملصقات كحد أقصى).
+ * @returns {Promise<boolean>} "true" إذا كان مسموحاً، و"false" إذا تجاوز الحد.
+ */
+async function checkRateLimit(){
+  if(!window._myUid){
+    toast('يجب تسجيل الدخول أولاً','error');
+    return false;
+  }
+
+  /* (أ) التحقق السريع من التخزين المحلي: 30 ثانية بين كل ملصقين */
+  const lastPinKey='aurapin_last_pin_ts';
+  const lastPinTs=localStorage.getItem(lastPinKey);
+  if(lastPinTs && (Date.now()-parseInt(lastPinTs,10))<30000){
+    toast('يرجى الانتظار 30 ثانية بين كل ملصق وآخر','error');
+    return false;
+  }
+
+  /* (ب) التحقق من عدد الملصقات في الساعة الأخيرة */
+  const hourAgo=Date.now()-3600000; /* 3600000 مللي ثانية = ساعة واحدة */
+  const recentPins=pins.filter(function(pin){
+    return pin.uid===window._myUid && pin.ts && pin.ts>hourAgo;
+  });
+  if(recentPins.length>=10){
+    toast('لقد تجاوزت الحد المسموح (10 ملصقات في الساعة). يرجى الانتظار.','error');
+    return false;
+  }
+
+  /* تسجيل وقت آخر ملصق في التخزين المحلي */
+  localStorage.setItem(lastPinKey,String(Date.now()));
+  return true;
+}
+
+async function saveTextPin(){
+if(isSaving)return;
+const t=document.getElementById('txt').value.trim();
+if(!t)return toast('اكتب نص الملصق أولاً','error');
+if(!gpsOk)return toast('انتظر GPS...','error');
+if(!window._fbReady)return toast('جاري الاتصال...','error');
+/* التحقق من حدود الإرسال قبل الحفظ */
+if(!await checkRateLimit())return;
+isSaving=true;
+const btn=document.getElementById('add-btn-text');
+btn.classList.add('loading');
+btn.disabled=true;
+try{
+await window._addPin({type:'text',text:t,lat,lng,ts:Date.now()});
+toast('✓ تم حفظ الملصق!','success');
+backToIdle();
+}catch(e){
+toast('⚠ تعذّر الحفظ: '+e.message,'error');
+}finally{
+isSaving=false;
+btn.classList.remove('loading');
+btn.disabled=false;
+}
+}
+window.saveTextPin=saveTextPin;
+async function savePhotoPin(){
+if(isSaving)return;
+if(!addFlowFile)return toast('اختر صورة أولاً','error');
+if(!gpsOk)return toast('انتظر GPS...','error');
+if(!window._fbReady || !window._myUid)return toast('جاري الاتصال...','error');
+/* التحقق من حدود الإرسال قبل الحفظ */
+if(!await checkRateLimit())return;
+const caption=document.getElementById('photo-caption').value.trim();
+isSaving=true;
+const btn=document.getElementById('add-btn-photo');
+btn.classList.add('loading');
+btn.disabled=true;
+try{
+const photoUrl=await uploadPhotoToCloudinary(addFlowFile);
+await window._addPin({type:'photo',photoUrl,text:caption,lat,lng,ts:Date.now()});
+toast('✓ تم حفظ الملصق!','success');
+backToIdle();
+}catch(e){
+toast('⚠ تعذّر رفع الصورة: '+e.message,'error');
+}finally{
+isSaving=false;
+btn.classList.remove('loading');
+btn.disabled=false;
+}
+}
+window.savePhotoPin=savePhotoPin;
+function dist(a,b,c,d){
+const R=6371000,r=Math.PI/180;
+const da=(c-a)*r,db=(d-b)*r;
+const x=Math.sin(da/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin(db/2)**2;
+return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
+}
+function ago(ts){
+if(!ts)return'';
+const m=Math.round((Date.now()-ts)/60000);
+return m<1?'الآن':m<60?m+'د':Math.round(m/60)+'س';
+}
+function toast(msg,type){
+const t=document.getElementById('toast');
+t.textContent=escHtml(msg);
+t.classList.remove('toast-success','toast-error');
+if(type==='success')t.classList.add('toast-success');
+if(type==='error')t.classList.add('toast-error');
+t.classList.add('show');
+setTimeout(()=>t.classList.remove('show'),2400);
+}
+let sidebarOpen=false;
+function openSidebar(){
+sidebarOpen=true;
+document.getElementById('sidebar').classList.add('show');
+document.getElementById('sidebar-overlay').classList.add('show');
+document.getElementById('sb-panel-content').innerHTML='';
+updateSidebarCounter();
+updateAccountUI();
+}
+window.openSidebar=openSidebar;
+function closeSidebar(){
+sidebarOpen=false;
+document.getElementById('sidebar').classList.remove('show');
+document.getElementById('sidebar-overlay').classList.remove('show');
+}
+window.closeSidebar=closeSidebar;
+function updateSidebarCounter(){
+const c=document.getElementById('sb-counter');
+const total=herePins.length+nearPins.length;
+c.textContent = total===0
+? 'ماكو ملصقات قريبة منك الحين'
+: '📍 '+total+(total===1?' ملصق قريب منك الحين':' ملصقات قريبة منك الحين');
+}
+let accountBusy=false;
+function updateAccountUI(){
+const ic=document.getElementById('sb-account-ic');
+const txt=document.getElementById('sb-account-text');
+if(!ic||!txt)return;
+if(window._isAnon===false && window._userLabel){
+ic.textContent='✓';
+txt.textContent='مسجل دخول بـ '+window._userLabel+' — اضغط لتسجيل الخروج';
+} else {
+ic.textContent='🔐';
+txt.textContent='سجّل دخولك بجوجل لتحفظ ملصقاتك';
+}
+}
+window._onAuthUpdate=updateAccountUI;
+async function handleAccountClick(){
+if(accountBusy)return;
+if(window._isAnon===false){
+if(!confirm('تسجيل الخروج؟ بترجع تستخدم التطبيق بدون حساب لين تسجل دخولك مرة ثانية.'))return;
+accountBusy=true;
+try{
+await window._signOutGoogle();
+toast('✓ تم تسجيل الخروج','success');
+}catch(e){
+toast('⚠ خطأ بتسجيل الخروج','error');
+}finally{
+accountBusy=false;
+updateAccountUI();
+}
+return;
+}
+toast('⏳ جاري التحويل لتسجيل الدخول بجوجل...');
+try{
+await window._signInGoogle();
+}catch(e){
+toast('⚠ تعذّر بدء تسجيل الدخول: '+e.message,'error');
+}
+}
+window.handleAccountClick=handleAccountClick;
+window._toastAfterRedirect=toast;
+function setTheme(mode){
+currentTheme=mode;
+document.getElementById('theme-auto').classList.toggle('active',mode==='auto');
+document.getElementById('theme-dark').classList.toggle('active',mode==='dark');
+document.getElementById('theme-light').classList.toggle('active',mode==='light');
+applyTheme();
+}
+window.setTheme=setTheme;
+function applyTheme(){
+let effective=currentTheme;
+if(currentTheme==='auto'){
+const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+effective = prefersLight ? 'light' : 'dark';
+}
+if(effective==='light') document.body.setAttribute('data-theme','light');
+else document.body.removeAttribute('data-theme');
+}
+if(window.matchMedia){
+window.matchMedia('(prefers-color-scheme: light)').addEventListener?.('change',()=>{
+if(currentTheme==='auto')applyTheme();
+});
+}
+setTheme('auto');
+function openNearbyList(){
+const wrap=document.getElementById('sb-panel-content');
+const combined=[...herePins,...nearPins].sort((a,b)=>a._d-b._d);
+if(!combined.length){
+wrap.innerHTML='<div class="sb-label" style="margin-top:18px">أماكن الملصقات القريبة</div><div class="sb-list-empty">ماكو ملصقات بنطاقك الحين — تحرّك شوي أو كن أول من يضع ملصق هنا 📍</div>';
+return;
+}
+wrap.innerHTML='<div class="sb-label" style="margin-top:18px">أماكن الملصقات القريبة</div>'+
+combined.map(p=>`
+<div class="sb-pin-row">
+${p.photoUrl?`<img class="sb-pin-thumb" src="${p.photoUrl}" alt=""/>`:''}
+<div class="sb-pin-text">${escHtml(p.text||(p.photoUrl?'📷 صورة':''))}</div>
+<div class="sb-pin-meta">${Math.round(p._d)}م • ${ago(p.ts)}</div>
+</div>`).join('');
+}
+window.openNearbyList=openNearbyList;
+function openMyPins(){
+const wrap=document.getElementById('sb-panel-content');
+const myUid=window._myUid;
+const mine=pins.filter(p=>myUid && p.uid===myUid).sort((a,b)=>(b.ts||0)-(a.ts||0));
+if(!mine.length){
+wrap.innerHTML='<div class="sb-label" style="margin-top:18px">ملصقاتي</div><div class="sb-list-empty">ماعندك ملصقات لسا — أضف أول ملصق من الشاشة الرئيسية 📍</div>';
+return;
+}
+wrap.innerHTML='<div class="sb-label" style="margin-top:18px">ملصقاتي ('+mine.length+')</div>'+
+mine.map(p=>`
+<div class="sb-pin-row">
+${p.photoUrl?`<img class="sb-pin-thumb" src="${p.photoUrl}" alt=""/>`:''}
+<div class="sb-pin-text">${escHtml(p.text||(p.photoUrl?'📷 صورة':''))}</div>
+<div class="sb-pin-meta">${ago(p.ts)}</div>
+<div class="sb-pin-del" onclick="deleteMyPin('${p.id}')">🗑 حذف</div>
+</div>`).join('');
+}
+window.openMyPins=openMyPins;
+async function deleteMyPin(pinId){
+if(!confirm('متأكد تبي تحذف هذا الملصق؟'))return;
+try{
+await window._deletePin(pinId);
+toast('✓ تم حذف الملصق','success');
+openMyPins();
+}catch(e){toast('⚠ خطأ بالحذف','error');}
+}
+window.deleteMyPin=deleteMyPin;
+function shareApp(){
+const url=location.href.split('#')[0];
+const text='جرّب AuraPin — ملصقات رقمية على أماكنك الحقيقية 📍';
+if(navigator.share){
+navigator.share({title:'AuraPin',text,url}).catch(()=>{});
+} else if(navigator.clipboard){
+navigator.clipboard.writeText(url).then(()=>toast('✓ تم نسخ الرابط','success'));
+} else {
+toast('الرابط: '+url);
+}
+}
+window.shareApp=shareApp;
+function contactSupport(){
+window.location.href='mailto:support@aurapin.app?subject=' + encodeURIComponent('دعم AuraPin');
+}
+window.contactSupport=contactSupport;
+function showAbout(){
+const wrap=document.getElementById('sb-panel-content');
+wrap.innerHTML=`<div class="sb-label" style="margin-top:18px">عن AuraPin</div>
+<div class="sb-pin-row">
+<div class="sb-pin-text">AuraPin يخليك ترتك ملصقات رقمية بمواقعك الحقيقية، يشوفها كل من يمر بنفس المكان بعدك.</div>
+<div class="sb-pin-meta">النسخة 6.4 • صنع بكل شغف 📍</div>
+</div>`;
+}
+window.showAbout=showAbout;
+/**
+ * تطهير النصوص قبل عرضها في واجهة المستخدم.
+ * يستبدل الرموز الخاصة (HTML entities) لمنع هجمات XSS.
+ * @param {string} s - النص المراد تطهيره.
+ * @returns {string} - النص الآمن.
+ */
+function escHtml(s){
+  return String(s)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#039;');
+}
+if('serviceWorker' in navigator){
+window.addEventListener('load', ()=>{
+navigator.serviceWorker.register('./sw.js').catch(()=>{});
+});
+}</script>
+</body>
+</html>
 </div>
 
 <div class="street-section">
