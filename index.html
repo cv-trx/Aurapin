@@ -343,10 +343,15 @@ const app = initializeApp({
 });
 
 /* ─── Firebase App Check — حماية API Key ─── */
-initializeAppCheck(app, {
-  provider: new ReCaptchaV3Provider('6LcQZ2UtAAAAAEC7rrDAlD6ODid0lO1PVB0jNc-s'),
-  isTokenAutoRefreshEnabled: true
-});
+try {
+  initializeAppCheck(app, {
+    provider: new ReCaptchaV3Provider('6LcQZ2UtAAAAAEC7rrDAlD6ODid0lO1PVB0jNc-s'),
+    isTokenAutoRefreshEnabled: true
+  });
+  console.log('[AppCheck] تم التهيئة بنجاح');
+} catch (e) {
+  console.error('[AppCheck] خطأ في التهيئة:', e);
+}
 /* ─────────────────────────────────────────── */
 const db=getFirestore(app);
 const auth=getAuth(app);
@@ -367,8 +372,27 @@ onAuthStateChanged(auth,(user)=>{
 
 signInAnonymously(auth).catch((e)=>console.error("Auth error:",e));
 
-window._addPin=(d)=>addDoc(col,{...d,uid:currentUserId});
-window._listen=(cb)=>onSnapshot(col,s=>cb(s.docs.map(d=>({id:d.id,...d.data()}))));
+window._addPin=async(d)=>{
+  try {
+    return await addDoc(col,{...d,uid:currentUserId});
+  } catch(e) {
+    console.error('[Firestore] خطأ في الإضافة:', e);
+    if(e.message && e.message.includes('appCheck')){
+      toast('⚠ فشل التحقق من App Check — تأكد من النطاق في reCAPTCHA','error');
+    }
+    throw e;
+  }
+};
+window._listen=(cb)=>{
+  onSnapshot(col, s=>{
+    cb(s.docs.map(d=>({id:d.id,...d.data()})));
+  }, err=>{
+    console.error('[Firestore] خطأ في الاستماع:', err);
+    if(err.message && err.message.includes('appCheck')){
+      toast('⚠ App Check: تحقق من إعدادات reCAPTCHA','error');
+    }
+  });
+};
 window._deletePin=(pinId)=>deleteDoc(doc(db,"pins",pinId));
 
 // تسجيل الدخول بجوجل عبر إعادة توجيه (redirect) — أوثق بكثير من النافذة المنبثقة على متصفحات الجوال
