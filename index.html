@@ -331,7 +331,7 @@ setTimeout(function(){
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
 import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
-import { getAuth, signInAnonymously, onAuthStateChanged, GoogleAuthProvider, linkWithRedirect, signInWithRedirect, getRedirectResult, signOut } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+import { getAuth, signInAnonymously, onAuthStateChanged, GoogleAuthProvider, linkWithPopup, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app-check.js";
 const app = initializeApp({
   apiKey:"AIzaSyCq0EQ9Rw1ea5UXVlVU0BoULs7XMcigJ7M",
@@ -359,6 +359,7 @@ const col=collection(db,"pins");
 
 let currentUserId=null;
 
+/* ─── إدارة المصادقة — نسخة موحّدة تعتمد على Popup بدل Redirect ─── */
 onAuthStateChanged(auth,(user)=>{
   if(user){
     currentUserId=user.uid;
@@ -396,41 +397,40 @@ window._listen=(cb)=>{
 };
 window._deletePin=(pinId)=>deleteDoc(doc(db,"pins",pinId));
 
-// تسجيل الدخول بجوجل عبر إعادة توجيه (redirect) — أوثق بكثير من النافذة المنبثقة على متصفحات الجوال
+/* تسجيل الدخول بجوجل عبر نافذة منبثقة (Popup) — بدون إعادة تحميل الصفحة،
+   وبالتالي بدون مشاكل تخزين الحالة بين نطاق الموقع (github.io) ونطاق Firebase (firebaseapp.com) */
 window._signInGoogle=async()=>{
   if(!auth.currentUser){
     toast('⚠ جاري تهيئة الحساب، يرجى المحاولة بعد ثوانٍ','error');
     return;
   }
+  const provider=new GoogleAuthProvider();
   try{
-    const provider=new GoogleAuthProvider();
-    await linkWithRedirect(auth.currentUser, provider);
-    /* الصفحة ستنتقل لجوجل ثم تعود — النتيجة تُعالج في getRedirectResult */
+    await linkWithPopup(auth.currentUser, provider);
+    if(window._toastAfterRedirect) window._toastAfterRedirect('✓ تم ربط حسابك! ملصقاتك محفوظة الآن','success');
   }catch(e){
-    console.error('[Auth] خطأ في linkWithRedirect:',e);
-    toast('⚠ تعذّر بدء تسجيل الدخول: '+e.message,'error');
+    if(e.code==='auth/credential-already-in-use'){
+      /* هذا الحساب بجوجل مربوط بحساب فايربيس ثاني من قبل (جهاز/متصفح آخر) —
+         نسجل دخول عليه مباشرة؛ ملصقات الجلسة الحالية (المجهولة) ما تنتقل له تلقائيًا */
+      try{
+        await signInWithPopup(auth, provider);
+        if(window._toastAfterRedirect) window._toastAfterRedirect('✓ تم تسجيل الدخول','success');
+      }catch(e2){
+        console.error('[Auth] خطأ في signInWithPopup:',e2);
+        toast('⚠ تعذّر تسجيل الدخول: '+e2.message,'error');
+      }
+    } else if(e.code==='auth/popup-closed-by-user'){
+      /* المستخدم أغلق النافذة بنفسه — ما نعرض خطأ */
+    } else {
+      console.error('[Auth] خطأ في linkWithPopup:',e);
+      toast('⚠ تعذّر تسجيل الدخول: '+e.message,'error');
+    }
   }
 };
 
-// نتحقق أول ما تفتح الصفحة إذا كانت راجعة من تسجيل دخول بجوجل
-getRedirectResult(auth).then((result)=>{
-  if(result && window._onAuthUpdate){
-    if(window._toastAfterRedirect) window._toastAfterRedirect('✓ تم ربط حسابك! ملصقاتك محفوظة الآن','success');
-  }
-}).catch((e)=>{
-  if(e.code==='auth/credential-already-in-use'){
-    // هذا الحساب بجوجل مربوط بحساب فايربيس ثاني من قبل (جهاز/متصفح آخر) —
-    // نسجل دخول عليه مباشرة بنفس بيانات جوجل؛ ملصقات الجلسة الحالية (المجهولة) ما تنتقل له تلقائيًا
-    const cred=GoogleAuthProvider.credentialFromError(e);
-    if(cred) signInWithRedirect(auth, new GoogleAuthProvider());
-  } else if(e.code && e.code!=='auth/no-auth-event' && window._toastAfterRedirect){
-    window._toastAfterRedirect('⚠ تعذّر تسجيل الدخول بجوجل','error');
-  }
-});
-
 window._signOutGoogle=async()=>{
   await signOut(auth);
-  await signInAnonymously(auth); // نرجع فورًا لحساب مجهول جديد عشان التطبيق يفضل شغال
+  await signInAnonymously(auth); /* نرجع فورًا لحساب مجهول جديد عشان التطبيق يفضل شغال */
 };
 </script>
 
@@ -1065,7 +1065,7 @@ updateAccountUI();
 }
 return;
 }
-toast('⏳ جاري التحويل لتسجيل الدخول بجوجل...');
+toast('⏳ جاري فتح نافذة تسجيل الدخول بجوجل...');
 try{
 await window._signInGoogle();
 }catch(e){
