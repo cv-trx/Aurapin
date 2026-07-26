@@ -396,9 +396,18 @@ window._deletePin=(pinId)=>deleteDoc(doc(db,"pins",pinId));
 
 // تسجيل الدخول بجوجل عبر إعادة توجيه (redirect) — أوثق بكثير من النافذة المنبثقة على متصفحات الجوال
 window._signInGoogle=async()=>{
-  const provider=new GoogleAuthProvider();
-  await linkWithRedirect(auth.currentUser, provider);
-  // الصفحة بتنتقل لجوجل الحين وترجع بعدها — النتيجة تُعالج تحت بـ getRedirectResult
+  if(!auth.currentUser){
+    toast('⚠ جاري تهيئة الحساب، يرجى المحاولة بعد ثوانٍ','error');
+    return;
+  }
+  try{
+    const provider=new GoogleAuthProvider();
+    await linkWithRedirect(auth.currentUser, provider);
+    /* الصفحة ستنتقل لجوجل ثم تعود — النتيجة تُعالج في getRedirectResult */
+  }catch(e){
+    console.error('[Auth] خطأ في linkWithRedirect:',e);
+    toast('⚠ تعذّر بدء تسجيل الدخول: '+e.message,'error');
+  }
 };
 
 // نتحقق أول ما تفتح الصفحة إذا كانت راجعة من تسجيل دخول بجوجل
@@ -810,6 +819,11 @@ toast('⚠ تعذّر معالجة الصورة','error');
 window.onFileSelected=onFileSelected;
 function compressImage(file){
 return new Promise((resolve,reject)=>{
+/* التحقق من حجم الملف قبل المعالجة (الحد الأقصى 10 ميجابايت) */
+if(file.size>10*1024*1024){
+  reject(new Error('حجم الملف كبير جداً — الحد الأقصى 10 ميجابايت'));
+  return;
+}
 const img=new Image();
 const reader=new FileReader();
 reader.onload=()=>{ img.src=reader.result; };
@@ -830,23 +844,33 @@ img.onerror=reject;
 reader.readAsDataURL(file);
 });
 }
-const CLOUDINARY_CLOUD_NAME='ix7jxz6r';
-const CLOUDINARY_UPLOAD_PRESET='Aurapin';
-async function uploadPhotoToCloudinary(blob){
-const formData=new FormData();
-formData.append('file', blob);
-formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-const res=await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,{
-method:'POST',
-body:formData
-});
-if(!res.ok){
-let msg='فشل رفع الصورة';
-try{ const err=await res.json(); if(err?.error?.message) msg=err.error.message; }catch(e){}
-throw new Error(msg);
-}
-const data=await res.json();
-return data.secure_url;
+/* ══════════════════════════════
+   Supabase Storage — رفع الصور (بديل Cloudinary)
+   ⚠ عدّل القيمتين تحت بمعلومات مشروعك من Supabase Dashboard → Settings → API
+══════════════════════════════ */
+const SUPABASE_URL='https://kwzwpawwwakrajmdtddh.supabase.co';
+const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt3endwYXd3d2FrcmFqbWR0ZGRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUwMTgxNzcsImV4cCI6MjEwMDU5NDE3N30.Fdq9Xo8dPF68q9crH_ANvtlia-faIXLa2tCUD3TCvT4';
+const SUPABASE_BUCKET='pins';
+
+async function uploadPhotoToSupabase(blob){
+  const fileName=`${Date.now()}_${Math.random().toString(36).slice(2,8)}.jpg`;
+  const uploadUrl=`${SUPABASE_URL}/storage/v1/object/${SUPABASE_BUCKET}/${fileName}`;
+  const res=await fetch(uploadUrl,{
+    method:'POST',
+    headers:{
+      'Authorization':`Bearer ${SUPABASE_ANON_KEY}`,
+      'apikey':SUPABASE_ANON_KEY,
+      'Content-Type':'image/jpeg'
+    },
+    body:blob
+  });
+  if(!res.ok){
+    let msg='فشل رفع الصورة';
+    try{ const err=await res.json(); if(err?.message) msg=err.message; }catch(e){}
+    throw new Error(msg);
+  }
+  /* الرابط العام — يشتغل فقط إذا كان الـ bucket مضبوط Public من لوحة Supabase */
+  return `${SUPABASE_URL}/storage/v1/object/public/${SUPABASE_BUCKET}/${fileName}`;
 }
 /**
  * التحقق من حدود المستخدم قبل إضافة ملصق جديد.
@@ -854,6 +878,8 @@ return data.secure_url;
  * يتحقق من:
  * 1. المدة بين كل ملصق وآخر (30 ثانية).
  * 2. عدد الملصقات في الساعة الأخيرة (10 ملصقات كحد أقصى).
+ * 3. عدم تعديل التخزين المحلي يدوياً (التحقق من تسلسل الوقت).
+ * ملاحظة: هذا التحقق جانبي (Client-side) فقط؛ الحماية الحقيقية تكون في Firestore Rules.
  * @returns {Promise<boolean>} "true" إذا كان مسموحاً، و"false" إذا تجاوز الحد.
  */
 async function checkRateLimit(){
@@ -865,20 +891,38 @@ async function checkRateLimit(){
   /* (أ) التحقق السريع من التخزين المحلي: 30 ثانية بين كل ملصقين */
   const lastPinKey='aurapin_last_pin_ts';
   const lastPinTs=localStorage.getItem(lastPinKey);
-  if(lastPinTs && (Date.now()-parseInt(lastPinTs,10))<30000){
-    toast('يرجى الانتظار 30 ثانية بين كل ملصق وآخر','error');
-    return false;
+  if(lastPinTs){
+    const lastTs=parseInt(lastPinTs,10);
+    if(!isNaN(lastTs) && (Date.now()-lastTs)<30000){
+      toast('يرجى الانتظار 30 ثانية بين كل ملصق وآخر','error');
+      return false;
+    }
   }
 
   /* (ب) التحقق من عدد الملصقات في الساعة الأخيرة */
   const hourAgo=Date.now()-3600000; /* 3600000 مللي ثانية = ساعة واحدة */
   const recentPins=pins.filter(function(pin){
-    return pin.uid===window._myUid && pin.ts && pin.ts>hourAgo;
+    return pin.uid===window._myUid && pin.ts && typeof pin.ts==='number' && pin.ts>hourAgo;
   });
   if(recentPins.length>=10){
     toast('لقد تجاوزت الحد المسموح (10 ملصقات في الساعة). يرجى الانتظار.','error');
     return false;
   }
+
+  /* (ج) التحقق من عدم وجود محاولات متعددة سريعة (تأخير إضافي) */
+  const attemptKey='aurapin_attempt_count';
+  const attemptTsKey='aurapin_attempt_window';
+  const windowStart=parseInt(localStorage.getItem(attemptTsKey)||'0',10);
+  let attempts=parseInt(localStorage.getItem(attemptKey)||'0',10);
+  if(Date.now()-windowStart>60000){
+    attempts=0;
+    localStorage.setItem(attemptTsKey,String(Date.now()));
+  }
+  if(attempts>=5){
+    toast('كثرة محاولات الإرسال — يرجى الانتظار دقيقة','error');
+    return false;
+  }
+  localStorage.setItem(attemptKey,String(attempts+1));
 
   /* تسجيل وقت آخر ملصق في التخزين المحلي */
   localStorage.setItem(lastPinKey,String(Date.now()));
@@ -891,6 +935,11 @@ const t=document.getElementById('txt').value.trim();
 if(!t)return toast('اكتب نص الملصق أولاً','error');
 if(!gpsOk)return toast('انتظر GPS...','error');
 if(!window._fbReady)return toast('جاري الاتصال...','error');
+/* التحقق من صحة الإحداثيات قبل الحفظ */
+if(!lat || !lng || isNaN(lat) || isNaN(lng) || (lat===0 && lng===0)){
+  toast('⚠ موقع GPS غير صالح — تأكد من تفعيل الموقع','error');
+  return;
+}
 /* التحقق من حدود الإرسال قبل الحفظ */
 if(!await checkRateLimit())return;
 isSaving=true;
@@ -915,6 +964,11 @@ if(isSaving)return;
 if(!addFlowFile)return toast('اختر صورة أولاً','error');
 if(!gpsOk)return toast('انتظر GPS...','error');
 if(!window._fbReady || !window._myUid)return toast('جاري الاتصال...','error');
+/* التحقق من صحة الإحداثيات قبل الحفظ */
+if(!lat || !lng || isNaN(lat) || isNaN(lng) || (lat===0 && lng===0)){
+  toast('⚠ موقع GPS غير صالح — تأكد من تفعيل الموقع','error');
+  return;
+}
 /* التحقق من حدود الإرسال قبل الحفظ */
 if(!await checkRateLimit())return;
 const caption=document.getElementById('photo-caption').value.trim();
@@ -923,7 +977,7 @@ const btn=document.getElementById('add-btn-photo');
 btn.classList.add('loading');
 btn.disabled=true;
 try{
-const photoUrl=await uploadPhotoToCloudinary(addFlowFile);
+const photoUrl=await uploadPhotoToSupabase(addFlowFile);
 await window._addPin({type:'photo',photoUrl,text:caption,lat,lng,ts:Date.now()});
 toast('✓ تم حفظ الملصق!','success');
 backToIdle();
