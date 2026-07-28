@@ -337,7 +337,7 @@ setTimeout(function(){
  
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
-import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, getDoc, writeBatch, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 import { getAuth, signInAnonymously, onAuthStateChanged, GoogleAuthProvider, linkWithPopup, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app-check.js";
 const app = initializeApp({
@@ -403,6 +403,57 @@ window._listen=(cb)=>{
   });
 };
 window._deletePin=(pinId)=>deleteDoc(doc(db,"pins",pinId));
+ 
+/* حدّ الإرسال الحقيقي (مفروض من Firestore Rules، وليس فقط من المتصفح) —
+   نقرأ حالة المستخدم الحالية، نحسب القيم الجديدة الصحيحة، ثم نرسل الملصق
+   وتحديث حالة الحدّ في صفقة واحدة (batch). لو القيم غير صحيحة أو الحدّ متجاوَز،
+   Firestore نفسه يرفض العملية بغض النظر عمّا يفعله المتصفح. */
+window._addPinWithRateLimit=async(pinData)=>{
+  if(!currentUserId) throw new Error('يجب تسجيل الدخول أولاً');
+  const rlRef=doc(db,"rateLimits",currentUserId);
+  let existing=null;
+  try{
+    const snap=await getDoc(rlRef);
+    if(snap.exists()) existing=snap.data();
+  }catch(e){
+    console.error('[RateLimit] تعذّر قراءة حالة الحدّ:',e);
+  }
+ 
+  const now=Date.now();
+  if(existing){
+    const lastMs=existing.lastPinTs?.toMillis?.() ?? 0;
+    if(now-lastMs<30000){
+      const wait=Math.ceil((30000-(now-lastMs))/1000);
+      throw new Error('يرجى الانتظار '+wait+' ثانية قبل إضافة ملصق آخر');
+    }
+    const windowMs=existing.hourWindowStart?.toMillis?.() ?? 0;
+    const windowExpired=(now-windowMs)>3600000;
+    if(!windowExpired && existing.hourCount>=10){
+      throw new Error('تجاوزت الحد المسموح (10 ملصقات في الساعة). يرجى الانتظار.');
+    }
+  }
+ 
+  const windowExpired = !existing || (now-(existing.hourWindowStart?.toMillis?.() ?? 0))>3600000;
+  const rlUpdate = windowExpired
+    ? { lastPinTs:serverTimestamp(), hourWindowStart:serverTimestamp(), hourCount:1 }
+    : { lastPinTs:serverTimestamp(), hourWindowStart:existing.hourWindowStart, hourCount:(existing.hourCount||0)+1 };
+ 
+  const pinRef=doc(collection(db,"pins"));
+  const batch=writeBatch(db);
+  batch.set(pinRef, {...pinData, uid:currentUserId});
+  batch.set(rlRef, rlUpdate, {merge:false});
+ 
+  try{
+    await batch.commit();
+    return pinRef;
+  }catch(e){
+    console.error('[Firestore] رُفضت العملية من جهة السيرفر:', e);
+    if(e.code==='permission-denied'){
+      throw new Error('تم رفض الطلب — على الأرجح تجاوزت حدّ الإرسال المسموح');
+    }
+    throw e;
+  }
+};
  
 /* تسجيل الدخول بجوجل عبر نافذة منبثقة (Popup) — بدون إعادة تحميل الصفحة،
    وبالتالي بدون مشاكل تخزين الحالة بين نطاق الموقع (github.io) ونطاق Firebase (firebaseapp.com) */
@@ -891,43 +942,12 @@ function uploadPhotoToSupabase(blob, onProgress){
   });
 }
 /**
- * التحقق من حدود المستخدم قبل إضافة ملصق جديد.
- * يمنع إرسال البيانات بكثرة (الحدّ من السبام).
- * يتحقق من:
- * 1. المدة بين كل ملصق وآخر (30 ثانية).
- * 2. عدد الملصقات في الساعة الأخيرة (10 ملصقات كحد أقصى).
- * 3. عدم تعديل التخزين المحلي يدوياً (التحقق من تسلسل الوقت).
- * ملاحظة: هذا التحقق جانبي (Client-side) فقط؛ الحماية الحقيقية تكون في Firestore Rules.
- * @returns {Promise<boolean>} "true" إذا كان مسموحاً، و"false" إذا تجاوز الحد.
+ * حارس سريع من جهة الواجهة يمنع الضغط المتكرر السريع على زر الإضافة (تجربة مستخدم فقط).
+ * الحدّ الفعلي (30 ثانية بين الملصقات، 10 بالساعة) أصبح مفروضًا من Firestore Rules
+ * عبر window._addPinWithRateLimit، ولا يمكن تجاوزه بتعديل التخزين المحلي.
+ * @returns {boolean}
  */
-async function checkRateLimit(){
-  if(!window._myUid){
-    toast('يجب تسجيل الدخول أولاً','error');
-    return false;
-  }
- 
-  /* (أ) التحقق السريع من التخزين المحلي: 30 ثانية بين كل ملصقين */
-  const lastPinKey='aurapin_last_pin_ts';
-  const lastPinTs=localStorage.getItem(lastPinKey);
-  if(lastPinTs){
-    const lastTs=parseInt(lastPinTs,10);
-    if(!isNaN(lastTs) && (Date.now()-lastTs)<30000){
-      toast('يرجى الانتظار 30 ثانية بين كل ملصق وآخر','error');
-      return false;
-    }
-  }
- 
-  /* (ب) التحقق من عدد الملصقات في الساعة الأخيرة */
-  const hourAgo=Date.now()-3600000; /* 3600000 مللي ثانية = ساعة واحدة */
-  const recentPins=pins.filter(function(pin){
-    return pin.uid===window._myUid && pin.ts && typeof pin.ts==='number' && pin.ts>hourAgo;
-  });
-  if(recentPins.length>=10){
-    toast('لقد تجاوزت الحد المسموح (10 ملصقات في الساعة). يرجى الانتظار.','error');
-    return false;
-  }
- 
-  /* (ج) التحقق من عدم وجود محاولات متعددة سريعة (تأخير إضافي) */
+function quickClickGuard(){
   const attemptKey='aurapin_attempt_count';
   const attemptTsKey='aurapin_attempt_window';
   const windowStart=parseInt(localStorage.getItem(attemptTsKey)||'0',10);
@@ -941,9 +961,6 @@ async function checkRateLimit(){
     return false;
   }
   localStorage.setItem(attemptKey,String(attempts+1));
- 
-  /* تسجيل وقت آخر ملصق في التخزين المحلي */
-  localStorage.setItem(lastPinKey,String(Date.now()));
   return true;
 }
  
@@ -958,18 +975,18 @@ if(!lat || !lng || isNaN(lat) || isNaN(lng) || (lat===0 && lng===0)){
   toast('⚠ موقع GPS غير صالح — تأكد من تفعيل الموقع','error');
   return;
 }
-/* التحقق من حدود الإرسال قبل الحفظ */
-if(!await checkRateLimit())return;
+/* حارس ضغط متكرر سريع (تجربة مستخدم فقط) */
+if(!quickClickGuard())return;
 isSaving=true;
 const btn=document.getElementById('add-btn-text');
 btn.classList.add('loading');
 btn.disabled=true;
 try{
-await window._addPin({type:'text',text:t,lat,lng,ts:Date.now()});
+await window._addPinWithRateLimit({type:'text',text:t,lat,lng,ts:Date.now()});
 toast('✓ تم حفظ الملصق!','success');
 backToIdle();
 }catch(e){
-toast('⚠ تعذّر الحفظ: '+e.message,'error');
+toast('⚠ '+e.message,'error');
 }finally{
 isSaving=false;
 btn.classList.remove('loading');
@@ -987,8 +1004,8 @@ if(!lat || !lng || isNaN(lat) || isNaN(lng) || (lat===0 && lng===0)){
   toast('⚠ موقع GPS غير صالح — تأكد من تفعيل الموقع','error');
   return;
 }
-/* التحقق من حدود الإرسال قبل الحفظ */
-if(!await checkRateLimit())return;
+/* حارس ضغط متكرر سريع (تجربة مستخدم فقط) */
+if(!quickClickGuard())return;
 const caption=document.getElementById('photo-caption').value.trim();
 isSaving=true;
 const btn=document.getElementById('add-btn-photo');
@@ -1005,11 +1022,11 @@ const photoUrl=await uploadPhotoToSupabase(addFlowFile, (pct)=>{
   progBar.style.setProperty('--pct',pct+'%');
   progTxt.textContent=pct+'%';
 });
-await window._addPin({type:'photo',photoUrl,text:caption,lat,lng,ts:Date.now()});
+await window._addPinWithRateLimit({type:'photo',photoUrl,text:caption,lat,lng,ts:Date.now()});
 toast('✓ تم حفظ الملصق!','success');
 backToIdle();
 }catch(e){
-toast('⚠ تعذّر رفع الصورة: '+e.message,'error');
+toast('⚠ '+e.message,'error');
 }finally{
 isSaving=false;
 btn.classList.remove('loading');
