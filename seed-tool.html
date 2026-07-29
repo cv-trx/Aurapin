@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AuraPin — أداة الزرع الداخلية (خاصة)</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Tajawal',system-ui,sans-serif}
+body{background:#0a0a12;color:#f0ece0;padding:20px;max-width:720px;margin:0 auto;direction:rtl}
+h1{font-size:20px;margin-bottom:6px;color:#ff2a6d}
+p.sub{font-size:12px;color:rgba(240,236,224,.5);margin-bottom:20px}
+textarea{width:100%;height:260px;background:#13131f;border:1px solid rgba(255,255,255,.1);
+  border-radius:8px;padding:12px;color:#f0ece0;font-family:monospace;font-size:13px;
+  direction:ltr;text-align:left;margin-bottom:12px;resize:vertical}
+label{font-size:12px;color:rgba(240,236,224,.6);display:block;margin-bottom:6px}
+button{background:#ff2a6d;color:#fff;border:none;border-radius:8px;padding:12px 20px;
+  font-size:14px;font-weight:700;cursor:pointer;margin-bottom:16px}
+button:disabled{opacity:.5;cursor:not-allowed}
+#log{background:#08080f;border:1px solid rgba(255,255,255,.08);border-radius:8px;
+  padding:14px;font-family:monospace;font-size:12px;max-height:400px;overflow-y:auto;
+  white-space:pre-wrap;line-height:1.7;direction:ltr;text-align:left}
+.ok{color:#00ff88}.err{color:#ff5050}.wait{color:#ffb300}.info{color:#05d9e8}
+#gate{position:fixed;inset:0;background:#0a0a12;display:flex;align-items:center;
+  justify-content:center;flex-direction:column;gap:14px;z-index:10}
+#gate input{padding:10px 14px;border-radius:8px;border:1px solid rgba(255,255,255,.15);
+  background:#13131f;color:#fff;font-size:14px}
+#gate button{margin:0}
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <div style="font-size:14px;color:rgba(240,236,224,.6)">هذي أداة داخلية خاصة — أدخل كلمة المرور</div>
+  <input type="password" id="gate-pw" placeholder="كلمة المرور"/>
+  <button onclick="checkGate()">دخول</button>
+</div>
+
+<div id="content" style="display:none">
+  <h1>📍 أداة زرع الملصقات (خاصة بصاحب المشروع فقط)</h1>
+  <p class="sub">هذي الأداة تكتب مباشرة على Firestore. كل سطرين: إحداثيات ثم نص، وفاصل سطر فاضي بين كل ملصق وآخر. لا تشارك رابط هذا الملف مع أحد ولا تربطه من التطبيق العام.</p>
+
+  <label>الملصقات (إحداثيات ثم نص، مفصولة بسطر فاضي):</label>
+  <textarea id="input"></textarea>
+
+  <div>
+    <label style="display:inline-block;margin-left:10px">تنويع التاريخ: من</label>
+    <input type="number" id="minDays" value="1" min="0" style="width:60px;padding:6px;border-radius:6px;border:1px solid rgba(255,255,255,.15);background:#13131f;color:#fff">
+    <label style="display:inline-block;margin:0 10px">إلى</label>
+    <input type="number" id="maxDays" value="45" min="0" style="width:60px;padding:6px;border-radius:6px;border:1px solid rgba(255,255,255,.15);background:#13131f;color:#fff">
+    <label style="display:inline-block;margin-right:10px">يوم مضى</label>
+  </div>
+  <br>
+
+  <button id="startBtn" onclick="startSeeding()">🌱 ابدأ الزرع</button>
+
+  <div id="log">جاهز — اضغط "ابدأ الزرع" لما تكون متأكد من المحتوى.</div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+import { getFirestore, collection, doc, writeBatch, serverTimestamp, getDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+import { getAuth, signInAnonymously, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app-check.js";
+
+const app = initializeApp({
+  apiKey:"AIzaSyCq0EQ9Rw1ea5UXVlVU0BoULs7XMcigJ7M",
+  authDomain:"aurapin-cv-trx.firebaseapp.com",
+  projectId:"aurapin-cv-trx",
+  storageBucket:"aurapin-cv-trx.firebasestorage.app",
+  messagingSenderId:"862864685862",
+  appId:"1:862864685862:web:825dfaf5a070bb46715fe7"
+});
+
+try{
+  initializeAppCheck(app, {
+    provider: new ReCaptchaV3Provider('6LcQZ2UtAAAAAEC7rrDAlD6ODid0lO1PVB0jNc-s'),
+    isTokenAutoRefreshEnabled: true
+  });
+}catch(e){ console.error('[AppCheck]', e); }
+
+const db = getFirestore(app);
+const auth = getAuth(app);
+let currentUid = null;
+
+onAuthStateChanged(auth, (user)=>{ if(user) currentUid = user.uid; });
+
+/* جلسة مجهولة جديدة تمامًا — تُستخدم كل ما وصلنا حد الـ 10 ملصقات بالساعة،
+   لأن الحد مربوط بمعرّف المستخدم (uid)، وجلسة جديدة تعني عداد جديد */
+window._freshAnonSession = async ()=>{
+  try{ await signOut(auth); }catch(e){}
+  await new Promise(r=>setTimeout(r, 400));
+  await signInAnonymously(auth);
+  await new Promise(r=>setTimeout(r, 600));
+};
+
+window._writePin = async (pinData)=>{
+  const rlRef = doc(db, "rateLimits", currentUid);
+  let existing = null;
+  try{
+    const snap = await getDoc(rlRef);
+    if(snap.exists()) existing = snap.data();
+  }catch(e){}
+
+  const now = Date.now();
+  const windowExpired = !existing || (now - (existing.hourWindowStart?.toMillis?.() ?? 0)) > 3600000;
+  const rlUpdate = windowExpired
+    ? { lastPinTs: serverTimestamp(), hourWindowStart: serverTimestamp(), hourCount: 1 }
+    : { lastPinTs: serverTimestamp(), hourWindowStart: existing.hourWindowStart, hourCount: (existing.hourCount||0)+1 };
+
+  const pinRef = doc(collection(db, "pins"));
+  const batch = writeBatch(db);
+  batch.set(pinRef, {...pinData, uid: currentUid});
+  batch.set(rlRef, rlUpdate);
+  await batch.commit();
+
+  const usedCount = windowExpired ? 1 : (existing.hourCount||0)+1;
+  return { usedCount };
+};
+
+window._initialAnonReady = signInAnonymously(auth);
+</script>
+
+<script>
+function checkGate(){
+  const pw = document.getElementById('gate-pw').value;
+  if(pw === 'aurapin-seed-2026'){
+    document.getElementById('gate').style.display='none';
+    document.getElementById('content').style.display='block';
+  } else {
+    alert('كلمة مرور خاطئة');
+  }
+}
+document.getElementById('gate-pw').addEventListener('keydown', e=>{ if(e.key==='Enter') checkGate(); });
+
+const PRESET = `32.0766639262746, 20.049904401772114
+عنده طعمية فوضى
+
+32.0733978777014, 20.049279593972226
+ديما زحمة هنا
+
+32.09547446225831, 20.06275153666825
+خدمة الكوبري جميلة ومنظمة
+
+32.10190772208845, 20.0726625426534
+تخيل بس يجيبولنا البارشا والريال هنا
+
+32.10653362202431, 20.141056047320912
+مول اللهم بارك امن وانضباط
+
+32.126988896232966, 20.07455640690659
+عنده نسكافيه عالمي جدا
+
+32.12273853967924, 20.059651609756685
+اااهههههههه الكورنيش وجماله
+
+32.12475140728997, 20.061940034457603
+الجو سمح اليوم
+
+32.12502579250345, 20.063583713696737
+منارة خريبيش التي تجمع بين اصالة الماضي تطور المستقبل
+
+32.079224698359226, 20.097292841440815
+ادعوا للمرضى بالشفاء
+
+32.05891382135249, 20.068613784295348
+مطعم يفلس بيك وانت لتو ماكملت حتى اسمه
+
+32.07480509147004, 20.07352187728231
+الافاهيتا متاع سوبر برغر قوية جدا
+
+32.075315046092335, 20.0749735906652
+اقوا برجر في بنغازي
+
+32.11165910007059, 20.089064237704747
+اللهم اشف كل مريض
+
+32.113762825592126, 20.11010162419844
+ميزة سوق المصرية تجيب معاك الف دينار تروح باثاث حوش كامل هههههههههه`;
+
+document.getElementById('input').value = PRESET;
+
+function parseEntries(raw){
+  const blocks = raw.trim().split(/\n\s*\n/);
+  const entries = [];
+  blocks.forEach(block=>{
+    const lines = block.trim().split('\n').map(l=>l.trim()).filter(Boolean);
+    if(lines.length < 2) return;
+    const coordMatch = lines[0].match(/(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)/);
+    if(!coordMatch) return;
+    const lat = parseFloat(coordMatch[1]);
+    const lng = parseFloat(coordMatch[2]);
+    const text = lines.slice(1).join(' ').trim();
+    if(!isNaN(lat) && !isNaN(lng) && text) entries.push({lat, lng, text});
+  });
+  return entries;
+}
+
+function randomPastTs(minDays, maxDays){
+  const days = minDays + Math.random()*(maxDays-minDays);
+  const extraJitterMs = Math.random()*86400000; /* ساعات/دقائق عشوائية داخل نفس اليوم */
+  return Date.now() - Math.round(days*86400000) - Math.round(extraJitterMs);
+}
+
+function log(msg, cls){
+  const el = document.getElementById('log');
+  const line = document.createElement('div');
+  if(cls) line.className = cls;
+  line.textContent = msg;
+  el.appendChild(line);
+  el.scrollTop = el.scrollHeight;
+}
+
+async function startSeeding(){
+  const btn = document.getElementById('startBtn');
+  btn.disabled = true;
+  document.getElementById('log').innerHTML = '';
+
+  const raw = document.getElementById('input').value;
+  const minDays = parseFloat(document.getElementById('minDays').value) || 0;
+  const maxDays = parseFloat(document.getElementById('maxDays').value) || 30;
+  const entries = parseEntries(raw);
+
+  if(!entries.length){
+    log('⚠ ما لقيت أي ملصقات صالحة بالنص المُدخل — تأكد من التنسيق', 'err');
+    btn.disabled = false;
+    return;
+  }
+
+  log(`جاري التجهيز... ${entries.length} ملصق للزرع`, 'info');
+  await window._initialAnonReady;
+  await new Promise(r=>setTimeout(r, 500));
+
+  let sessionCount = 0;
+
+  for(let i=0; i<entries.length; i++){
+    const entry = entries[i];
+
+    if(sessionCount >= 10){
+      log('⏳ وصلنا حد 10 ملصقات — نبدأ جلسة جديدة لإكمال الباقي...', 'wait');
+      await window._freshAnonSession();
+      sessionCount = 0;
+    } else if(i > 0){
+      log('⏳ ننتظر 31 ثانية (حد الإرسال بين الملصقات)...', 'wait');
+      await new Promise(r=>setTimeout(r, 31000));
+    }
+
+    try{
+      const pinData = {
+        type: 'text',
+        text: entry.text,
+        lat: entry.lat,
+        lng: entry.lng,
+        ts: randomPastTs(minDays, maxDays)
+      };
+      const result = await window._writePin(pinData);
+      sessionCount = result.usedCount;
+      log(`✓ [${i+1}/${entries.length}] تمت إضافة: "${entry.text.slice(0,30)}..." — (${entry.lat}, ${entry.lng})`, 'ok');
+    }catch(e){
+      log(`✗ [${i+1}/${entries.length}] فشل: ${e.message}`, 'err');
+    }
+  }
+
+  log('🎉 انتهى الزرع بالكامل.', 'ok');
+  btn.disabled = false;
+}
+window.startSeeding = startSeeding;
+</script>
+</body>
+</html>
