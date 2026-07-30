@@ -1,43 +1,55 @@
-// AuraPin Service Worker — يخزّن واجهة التطبيق فقط (الصفحة + الأيقونات)
-// بيانات الملصقات نفسها (Firestore/Cloudinary) ما تنخزن هنا — تحتاج إنترنت دايمًا
-const CACHE_NAME = 'aurapin-shell-v2';
+/* AuraPin Service Worker — يخزّن هيكل التطبيق (الواجهة) محليًا حتى يفتح بدون اتصال.
+   لا يخزّن بيانات الملصقات نفسها (تلك مسؤولية IndexedDB داخل index.html). */
+
+const CACHE_NAME = 'aurapin-shell-v1';
 const SHELL_FILES = [
   './',
   './index.html',
   './manifest.json',
-  './icon-192.png',
-  './icon-512.png'
+  './favicon-32.png',
+  './apple-touch-icon.png'
 ];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(SHELL_FILES))
-      .then(() => self.skipWaiting())
+    caches.open(CACHE_NAME).then((cache) => {
+      /* addAll يفشل كامل لو ملف واحد ناقص — نضيف كل ملف لحاله عشان ما يوقف التثبيت */
+      return Promise.all(
+        SHELL_FILES.map((file) =>
+          cache.add(file).catch((e) => console.warn('[SW] تعذّر تخزين:', file, e))
+        )
+      );
+    }).then(() => self.skipWaiting())
   );
 });
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
+    caches.keys().then((names) =>
+      Promise.all(
+        names.filter((n) => n !== CACHE_NAME).map((n) => caches.delete(n))
+      )
     ).then(() => self.clients.claim())
   );
 });
 
 self.addEventListener('fetch', (event) => {
   const req = event.request;
-  // بس نتعامل مع طلبات GET من نفس الموقع (واجهة التطبيق) — أي شي خارجي (فايربيس/كلاودنري) يروح للنت مباشرة
-  if (req.method !== 'GET' || new URL(req.url).origin !== self.location.origin) return;
 
-  // network-first: نجيب أحدث نسخة من النت دايمًا؛ الكاش بس احتياطي لو ما فيه إنترنت
+  /* لا نتدخل أبدًا بطلبات Firebase أو Supabase أو أي API خارجي —
+     هذي بيانات حية يجب أن تفشل بوضوح لو ما فيه نت، لا أن تُخدَّم من كاش قديم */
+  if (!req.url.startsWith(self.location.origin)) return;
+
+  /* طلبات التنقل (فتح الصفحة نفسها): جرّب الشبكة أولًا، ولو فشلت ارجع للنسخة المخزَّنة */
+  if (req.mode === 'navigate') {
+    event.respondWith(
+      fetch(req).catch(() => caches.match('./index.html'))
+    );
+    return;
+  }
+
+  /* باقي ملفات الهيكل (أيقونات، مانيفست): كاش أولًا، ولو مو موجود جرّب الشبكة */
   event.respondWith(
-    fetch(req).then((res) => {
-      if (res && res.ok) {
-        const clone = res.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(req, clone));
-      }
-      return res;
-    }).catch(() => caches.match(req))
+    caches.match(req).then((cached) => cached || fetch(req).catch(() => undefined))
   );
 });
