@@ -1104,7 +1104,7 @@ window.onFileSelected=onFileSelected;
    تسجيل الصوت — MediaRecorder، حد أقصى ثابت يسهل تعديله لاحقًا
 ══════════════════════════════ */
 const MAX_RECORD_SECONDS=30;
-let mediaRecorder=null,audioChunks=[],audioStream=null,recordTimerId=null,recordStartTs=0,recordedAudioBlob=null;
+let mediaRecorder=null,audioChunks=[],audioStream=null,recordTimerId=null,recordStartTs=0,recordedAudioBlob=null,audioCtx=null;
 
 function chooseAudio(){
   showPanelView('view-audio-record');
@@ -1130,9 +1130,28 @@ async function startAudioRecording(){
     }
   }
   audioChunks=[];
+  // خط معالجة صوت: المايك ← تكبير يدوي ← ضاغط ديناميكي (يوازن القريب/البعيد) ← التسجيل
+  let recordingStream=audioStream;
+  try{
+    audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    const source=audioCtx.createMediaStreamSource(audioStream);
+    const gainNode=audioCtx.createGain();
+    gainNode.gain.value=1.8; // تكبير معتدل — يرفع الصوت البعيد بدون تشويه القريب
+    const compressor=audioCtx.createDynamicsCompressor();
+    compressor.threshold.value=-40;
+    compressor.knee.value=30;
+    compressor.ratio.value=8;   // يقلص الصوت العالي (قريب) ويرفع المنخفض (بعيد) تلقائيًا
+    compressor.attack.value=0.005;
+    compressor.release.value=0.25;
+    const dest=audioCtx.createMediaStreamDestination();
+    source.connect(gainNode).connect(compressor).connect(dest);
+    recordingStream=dest.stream;
+  }catch(e){
+    recordingStream=audioStream; // لو AudioContext ما اشتغل، نسجل من المايك مباشرة بدون معالجة
+  }
   const mime = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm'
     : MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : '';
-  mediaRecorder = mime ? new MediaRecorder(audioStream,{mimeType:mime,audioBitsPerSecond:128000}) : new MediaRecorder(audioStream);
+  mediaRecorder = mime ? new MediaRecorder(recordingStream,{mimeType:mime,audioBitsPerSecond:128000}) : new MediaRecorder(recordingStream);
   mediaRecorder.ondataavailable=(e)=>{ if(e.data.size>0) audioChunks.push(e.data); };
   mediaRecorder.onstop=()=>{
     recordedAudioBlob=new Blob(audioChunks,{type:mediaRecorder.mimeType||'audio/webm'});
@@ -1170,6 +1189,7 @@ window.toggleAudioRecording=toggleAudioRecording;
 
 function stopAudioStreamTracks(){
   if(audioStream){ audioStream.getTracks().forEach(t=>t.stop()); audioStream=null; }
+  if(audioCtx){ audioCtx.close().catch(()=>{}); audioCtx=null; }
 }
 
 function cancelAudioRecording(){
