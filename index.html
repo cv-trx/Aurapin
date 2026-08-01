@@ -21,7 +21,10 @@
 #audio-rec-btn:active{transform:scale(.94)}
 #audio-rec-btn.recording{animation:ar-dot-pulse 1.2s ease-in-out infinite}
 #audio-rec-btn.recording #audio-rec-icon{border-radius:4px;width:18px;height:18px;background:var(--neon-pink);display:inline-block;font-size:0}
-#audio-rec-timer{font-family:var(--mono);font-size:13px;color:rgba(240,236,224,.6);letter-spacing:.05em}
+#audio-rec-status{font-family:var(--body);font-size:13px;color:rgba(240,236,224,.65)}
+#audio-rec-status.recording{color:var(--neon-pink)}
+#audio-rec-timer{font-family:var(--mono);font-size:13px;color:rgba(240,236,224,.6);letter-spacing:.05em;display:none}
+#audio-rec-timer.show{display:block}
 #audio-rec-timer.warn{color:var(--amber)}
 #audio-preview-wrap{display:flex;justify-content:center;margin-bottom:12px}
 #audio-preview-player{width:100%}
@@ -303,8 +306,9 @@ setTimeout(function(){
     <div id="view-audio-record" class="panel-view">
       <div id="audio-rec-wrap">
         <div id="audio-rec-ring">
-          <button id="audio-rec-btn" onclick="toggleAudioRecording()"><span id="audio-rec-icon">●</span></button>
+          <button id="audio-rec-btn" onclick="handleAudioRecordBtn()"><span id="audio-rec-icon">🎙️</span></button>
         </div>
+        <div id="audio-rec-status">اضغط لبدء التسجيل</div>
         <div id="audio-rec-timer">0:00 / 0:30</div>
       </div>
       <button class="panel-back" onclick="cancelAudioRecording()">→ رجوع</button>
@@ -1107,13 +1111,21 @@ const MAX_RECORD_SECONDS=30;
 let mediaRecorder=null,audioChunks=[],audioStream=null,recordTimerId=null,recordStartTs=0,recordedAudioBlob=null,audioCtx=null;
 
 function chooseAudio(){
+  resetRecordUI();
   showPanelView('view-audio-record');
-  startAudioRecording();
 }
 window.chooseAudio=chooseAudio;
 
+function handleAudioRecordBtn(){
+  if(mediaRecorder && mediaRecorder.state==='recording'){
+    toggleAudioRecording();
+  } else {
+    startAudioRecording();
+  }
+}
+window.handleAudioRecordBtn=handleAudioRecordBtn;
+
 async function startAudioRecording(){
-  resetRecordUI();
   try{
     audioStream=await navigator.mediaDevices.getUserMedia({audio:{
       autoGainControl:true,
@@ -1161,6 +1173,11 @@ async function startAudioRecording(){
   mediaRecorder.start();
   recordStartTs=Date.now();
   document.getElementById('audio-rec-btn').classList.add('recording');
+  document.getElementById('audio-rec-icon').textContent='';
+  const statusEl=document.getElementById('audio-rec-status');
+  statusEl.textContent='🔴 جاري التسجيل... اضغط للإيقاف';
+  statusEl.classList.add('recording');
+  document.getElementById('audio-rec-timer').classList.add('show');
   tickRecordUI();
   recordTimerId=setInterval(tickRecordUI,200);
 }
@@ -1206,8 +1223,13 @@ window.cancelAudioRecording=cancelAudioRecording;
 
 function resetRecordUI(){
   document.getElementById('audio-rec-timer').textContent='0:00 / 0:'+String(MAX_RECORD_SECONDS).padStart(2,'0');
-  document.getElementById('audio-rec-timer').classList.remove('warn');
+  document.getElementById('audio-rec-timer').classList.remove('warn','show');
   document.getElementById('audio-rec-ring').style.setProperty('--rec-pct','0%');
+  document.getElementById('audio-rec-btn').classList.remove('recording');
+  document.getElementById('audio-rec-icon').textContent='🎙️';
+  const statusEl=document.getElementById('audio-rec-status');
+  statusEl.textContent='اضغط لبدء التسجيل';
+  statusEl.classList.remove('recording');
 }
 
 function showAudioPreview(){
@@ -1220,8 +1242,8 @@ function showAudioPreview(){
 function reRecordAudio(){
   recordedAudioBlob=null;
   document.getElementById('audio-caption').value='';
+  resetRecordUI();
   showPanelView('view-audio-record');
-  startAudioRecording();
 }
 window.reRecordAudio=reRecordAudio;
 
