@@ -1118,7 +1118,7 @@ async function startAudioRecording(){
     audioStream=await navigator.mediaDevices.getUserMedia({audio:{
       autoGainControl:true,
       noiseSuppression:{ideal:false},
-      echoCancellation:true
+      echoCancellation:false
     }});
   }catch(e){
     try{
@@ -1138,11 +1138,11 @@ async function startAudioRecording(){
     const gainNode=audioCtx.createGain();
     gainNode.gain.value=1.8; // تكبير معتدل — يرفع الصوت البعيد بدون تشويه القريب
     const compressor=audioCtx.createDynamicsCompressor();
-    compressor.threshold.value=-40;
+    compressor.threshold.value=-32;
     compressor.knee.value=30;
-    compressor.ratio.value=8;   // يقلص الصوت العالي (قريب) ويرفع المنخفض (بعيد) تلقائيًا
-    compressor.attack.value=0.005;
-    compressor.release.value=0.25;
+    compressor.ratio.value=5;   // يقلص الصوت العالي (قريب) ويرفع المنخفض (بعيد) تلقائيًا
+    compressor.attack.value=0.03;
+    compressor.release.value=0.35;
     const dest=audioCtx.createMediaStreamDestination();
     source.connect(gainNode).connect(compressor).connect(dest);
     recordingStream=dest.stream;
