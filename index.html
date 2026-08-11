@@ -586,8 +586,8 @@ document.addEventListener('visibilitychange', () => {
 if(document.visibilityState !== 'visible') return;
 const appShown = document.getElementById('app').classList.contains('show');
 if(!appShown) return;
-const dead = !camStream || camStream.getVideoTracks().every(t => t.readyState === 'ended');
-if(dead) startCamera();
+if(camStream){ camStream.getTracks().forEach(t=>t.stop()); camStream=null; }
+startCamera();
 });
 async function boot(){
 document.getElementById('start').classList.add('gone');
