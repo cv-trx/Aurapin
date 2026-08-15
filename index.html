@@ -43,6 +43,14 @@
 #add-btn-audio{flex:1;background:var(--neon-pink);border:none;border-radius:10px;padding:12px;font-family:var(--body);font-size:14px;font-weight:700;color:#fff;cursor:pointer;box-shadow:0 4px 20px rgba(255,42,109,.4);display:flex;align-items:center;justify-content:center;gap:6px}
 #add-btn-audio.cooldown{background:rgba(255,255,255,.08);box-shadow:none}
 #reveal-audio{width:100%;margin-top:14px}
+#report-btn{font-family:var(--mono);font-size:10px;color:rgba(240,236,224,.35);background:none;border:none;cursor:pointer;margin-top:10px;letter-spacing:.04em}
+#report-modal{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;background:rgba(5,5,10,.85);padding:20px;backdrop-filter:blur(4px)}
+#report-modal.show{display:flex}
+#report-modal-card{background:var(--asphalt);border:1px solid var(--border);border-radius:16px;padding:20px;max-width:340px;width:100%;text-align:center}
+#report-modal-title{font-family:var(--body);font-size:15px;color:var(--paper);margin-bottom:14px}
+.report-reason-btn{display:block;width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px;font-family:var(--body);font-size:14px;color:var(--paper);cursor:pointer}
+.report-reason-btn:active{background:rgba(255,80,80,.12);border-color:rgba(255,80,80,.3)}
+.sb-pin-report{font-family:var(--mono);font-size:10px;color:rgba(240,236,224,.35);margin-top:6px;margin-right:12px;cursor:pointer;display:inline-block}
 .privacy-toggle{display:flex;align-items:center;justify-content:center;gap:8px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:10px;font-family:var(--body);font-size:13px;color:rgba(240,236,224,.7);cursor:pointer;transition:background .2s,border-color .2s}
 .privacy-toggle.is-private{border-color:rgba(255,179,0,.35);background:rgba(255,179,0,.08);color:var(--amber)}
 .privacy-toggle .pt-ic{font-size:15px}
@@ -259,12 +267,24 @@ setTimeout(function(){
         <button class="rnav" onclick="nextPin()">التالي ←</button>
       </div>
       <button id="del-btn" class="rnav" style="display:none;margin-top:8px;color:rgba(255,80,80,.7);border-color:rgba(255,80,80,.25)" onclick="deletePin()">🗑 حذف ملصقي</button>
+      <button id="report-btn" style="display:none" onclick="openReportModal(openPinId)">🚩 إبلاغ عن هذا الملصق</button>
     </div>
   </div>
 
   <div id="img-lightbox" onclick="closeImageLightbox()">
     <img id="img-lightbox-img" src="" alt="عرض الصورة كاملة"/>
     <div id="img-lightbox-close">✕</div>
+  </div>
+
+  <div id="report-modal">
+    <div id="report-modal-card">
+      <div id="report-modal-title">ما سبب الإبلاغ عن هذا الملصق؟</div>
+      <button class="report-reason-btn" onclick="submitReport('مسيء')">محتوى مسيء</button>
+      <button class="report-reason-btn" onclick="submitReport('غير لائق')">غير لائق</button>
+      <button class="report-reason-btn" onclick="submitReport('سبام')">سبام</button>
+      <button class="report-reason-btn" onclick="submitReport('أخرى')">أخرى</button>
+      <button class="panel-cancel" onclick="closeReportModal()">إلغاء</button>
+    </div>
   </div>
 
   <div id="panel">
@@ -425,7 +445,7 @@ setTimeout(function(){
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
-import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, getDoc, writeBatch, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, getDoc, setDoc, writeBatch, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 import { getAuth, signInAnonymously, onAuthStateChanged, GoogleAuthProvider, linkWithPopup, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app-check.js";
 const app = initializeApp({
@@ -491,6 +511,20 @@ window._listen=(cb)=>{
   });
 };
 window._deletePin=(pinId)=>deleteDoc(doc(db,"pins",pinId));
+
+window._reportPin=async(pinId,reason)=>{
+  if(!currentUserId) throw new Error('يجب تسجيل الدخول أولاً');
+  const reportId=pinId+'_'+currentUserId;
+  const reportRef=doc(db,"reports",reportId);
+  try{
+    await setDoc(reportRef,{pinId,reason,reporterUid:currentUserId,ts:serverTimestamp()});
+  }catch(e){
+    if(e.code==='permission-denied'){
+      throw new Error('تم إبلاغك عن هذا الملصق مسبقًا');
+    }
+    throw e;
+  }
+};
 
 /* حدّ الإرسال الحقيقي (مفروض من Firestore Rules، وليس فقط من المتصفح) —
    نقرأ حالة المستخدم الحالية، نحسب القيم الجديدة الصحيحة، ثم نرسل الملصق
@@ -874,6 +908,36 @@ document.getElementById('img-lightbox').classList.remove('show');
 document.getElementById('img-lightbox-img').removeAttribute('src');
 }
 window.closeImageLightbox=closeImageLightbox;
+
+/* ══════════════════════════════
+   نظام الإبلاغ عن المحتوى — يحفظ بمجموعة reports بـ Firestore (مراجعة يدوية من Console)
+══════════════════════════════ */
+let reportTargetPinId=null;
+function openReportModal(pinId){
+if(!pinId)return;
+reportTargetPinId=pinId;
+document.getElementById('report-modal').classList.add('show');
+}
+window.openReportModal=openReportModal;
+function closeReportModal(){
+reportTargetPinId=null;
+document.getElementById('report-modal').classList.remove('show');
+}
+window.closeReportModal=closeReportModal;
+async function submitReport(reason){
+if(!reportTargetPinId)return;
+if(!window._myUid)return toast('جاري الاتصال...','error');
+try{
+await window._reportPin(reportTargetPinId,reason);
+toast('✓ تم استلام بلاغك، شكرًا لك','success');
+}catch(e){
+toast('⚠ '+e.message,'error');
+}finally{
+closeReportModal();
+}
+}
+window.submitReport=submitReport;
+
 function refreshReveal(){
 if(!openPinId) return;
 const hIdx = herePins.findIndex(x=>x.id===openPinId);
@@ -915,6 +979,7 @@ document.getElementById('reveal-nav').style.display=showNav?'flex':'none';
 const delBtn=document.getElementById('del-btn');
 const isMine = window._myUid && p.uid === window._myUid;
 delBtn.style.display = isMine ? 'inline-block' : 'none';
+document.getElementById('report-btn').style.display = isMine ? 'none' : 'block';
 }
 async function deletePin(){
 if(!openPinId)return;
@@ -1765,6 +1830,7 @@ ${p.photoUrl?`<img class="sb-pin-thumb" src="${p.photoUrl}" alt="" onclick="open
 ${p.audioUrl?`<audio class="sb-pin-audio" controls src="${p.audioUrl}" style="width:100%;margin-bottom:8px"></audio>`:''}
 <div class="sb-pin-text">${escHtml(p.text||(p.photoUrl?'📷 صورة':p.audioUrl?'🎙️ تسجيل صوتي':''))}</div>
 <div class="sb-pin-meta">${Math.round(p._d)}م • ${ago(p.ts)}</div>
+${(window._myUid && p.uid===window._myUid)?'':`<span class="sb-pin-report" onclick="openReportModal('${p.id}')">🚩 إبلاغ</span>`}
 </div>`).join('');
 }
 window.openNearbyList=openNearbyList;
