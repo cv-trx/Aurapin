@@ -1735,6 +1735,20 @@ t.classList.add('show');
 setTimeout(()=>t.classList.remove('show'),2400);
 }
 let sidebarOpen=false;
+/* ماسك أخطاء مؤقت — يعرض أي خطأ JS كـ toast بدل ما يختفي بصمت بالكونسول (مفيد للفحص من الجوال بدون devtools) */
+let lastErrorShownAt=0;
+window.addEventListener('error',(e)=>{
+  const now=Date.now();
+  if(now-lastErrorShownAt<3000)return; /* يمنع سيل toasts لو تكرر نفس الخطأ */
+  lastErrorShownAt=now;
+  toast('🐞 خطأ: '+(e.message||'غير معروف').slice(0,80),'error');
+});
+window.addEventListener('unhandledrejection',(e)=>{
+  const now=Date.now();
+  if(now-lastErrorShownAt<3000)return;
+  lastErrorShownAt=now;
+  toast('🐞 خطأ Promise: '+String(e.reason&&e.reason.message||e.reason||'غير معروف').slice(0,80),'error');
+});
 function openSidebar(){
 sidebarOpen=true;
 document.getElementById('sidebar').classList.add('show');
@@ -1891,23 +1905,4 @@ wrap.innerHTML=`<div class="sb-label" style="margin-top:18px">عن AuraPin</div>
 }
 window.showAbout=showAbout;
 /**
- * تطهير النصوص قبل عرضها في واجهة المستخدم.
- * يستبدل الرموز الخاصة (HTML entities) لمنع هجمات XSS.
- * @param {string} s - النص المراد تطهيره.
- * @returns {string} - النص الآمن.
- */
-function escHtml(s){
-  return String(s)
-    .replace(/&/g,'&amp;')
-    .replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;')
-    .replace(/'/g,'&#039;');
-}
-if('serviceWorker' in navigator){
-window.addEventListener('load', ()=>{
-navigator.serviceWorker.register('./sw.js').catch(()=>{});
-});
-}</script>
-</body>
-</html>
+ 
