@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AuraPin — سياسة الخصوصية وشروط الاستخدام</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Tajawal:wght@300;400;500;700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --night:#0a0a12;
+  --card:#13131f;
+  --border:rgba(255,255,255,.08);
+  --pink:#ff2a6d;
+  --paper:#f0ece0;
+  --dim:rgba(240,236,224,.65);
+  --mono:'DM Mono',monospace;
+  --title:'Bebas Neue',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  background:var(--night);color:var(--paper);
+  font-family:'Tajawal',sans-serif;line-height:1.9;
+  padding:28px 18px 60px;max-width:760px;margin:0 auto;
+}
+header{text-align:center;padding:20px 0 28px;border-bottom:1px solid var(--border);margin-bottom:28px}
+header h1{
+  font-family:var(--title);font-size:34px;letter-spacing:.08em;
+  color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.8);
+  text-shadow:0 0 16px rgba(255,42,109,.4);
+}
+header p{color:var(--dim);font-size:12px;margin-top:8px;font-family:var(--mono);letter-spacing:.04em}
+h2{
+  font-size:19px;color:var(--paper);margin:34px 0 12px;
+  padding-bottom:8px;border-bottom:2px solid var(--pink);
+}
+h3{font-size:15px;color:var(--pink);margin:18px 0 8px}
+p{color:var(--dim);margin-bottom:10px;font-size:14.5px}
+ul{margin:8px 0 14px 0;padding-right:20px;color:var(--dim)}
+li{margin-bottom:7px;font-size:14.5px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px 20px;margin-bottom:16px}
+.mono{font-family:var(--mono);font-size:13px;color:var(--pink);background:rgba(255,42,109,.08);padding:2px 6px;border-radius:4px}
+footer{text-align:center;color:rgba(240,236,224,.25);font-family:var(--mono);font-size:11px;margin-top:44px;padding-top:20px;border-top:1px solid var(--border)}
+a{color:var(--pink)}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📍 AURAPIN</h1>
+  <p>سياسة الخصوصية وشروط الاستخدام — آخر تحديث: أغسطس ٢٠٢٦</p>
+</header>
+
+<section>
+  <h2>أولًا: سياسة الخصوصية</h2>
+
+  <div class="card">
+    <h3>البيانات التي نجمعها</h3>
+    <ul>
+      <li><strong>موقعك الجغرافي (GPS):</strong> إحداثيات دقيقة (خط الطول والعرض) وقت إنشاء أي ملصق، تُحفظ مرتبطة بالملصق نفسه لتحديد مكانه على الخريطة.</li>
+      <li><strong>معرّف مستخدم مجهول (UID):</strong> رقم تعريف عشوائي يُنشأ تلقائيًا عبر خدمة Firebase Anonymous Authentication عند أول استخدام للتطبيق، بدون ربطه باسمك أو بريدك الإلكتروني ما لم تختر تسجيل الدخول بحساب Google.
+      <li><strong>محتوى الملصقات:</strong> أي نص أو صورة أو تسجيل صوتي تختار إضافته.</li>
+      <li><strong>بيانات الحساب (اختياري):</strong> في حال ربطت حسابك بجوجل، نحصل على اسمك و/أو بريدك الإلكتروني كما تُظهره Google، فقط لعرضه لك داخل التطبيق.</li>
+      <li><strong>بيانات استخدام عامة:</strong> عبر Google Analytics، نجمع إحصائيات مجهولة عن كيفية استخدام التطبيق (عدد الزيارات، الشاشات الأكثر استخدامًا) دون ربطها بهويتك الشخصية.</li>
+    </ul>
+
+    <h3>كيف نستخدم بياناتك</h3>
+    <ul>
+      <li>عرض الملصقات للمستخدمين الآخرين عند وجودهم في نفس الموقع الجغرافي (للملصقات العامة فقط).</li>
+      <li>تمكينك من الوصول لملصقاتك الخاصة وحذفها.</li>
+      <li>تحسين أداء التطبيق وفهم كيفية استخدامه.</li>
+      <li>فرض حدود الإرسال ومنع إساءة الاستخدام.</li>
+    </ul>
+
+    <h3>أين تُخزَّن بياناتك</h3>
+    <p>تُخزَّن البيانات النصية والوصفية عبر <span class="mono">Firebase Firestore</span> (خدمة تابعة لشركة Google)، والصور والتسجيلات الصوتية عبر <span class="mono">Supabase Storage</span>. كلا الخدمتين تديران مراكز بيانات خاصة بهما وفق سياساتهما الخاصة بالأمان.</p>
+
+    <h3>الملصقات الخاصة مقابل العامة</h3>
+    <p>عند اختيارك جعل الملصق <strong>"خاص"</strong>، لا يظهر إلا لك أنت — لا يستطيع أي مستخدم آخر رؤيته أو الوصول إليه، وهذا مفروض على مستوى قاعدة البيانات نفسها وليس فقط بواجهة التطبيق. الملصقات <strong>"العامة"</strong> يراها أي مستخدم يمر بنفس الموقع الجغرافي.</p>
+
+    <h3>حقوقك</h3>
+    <ul>
+      <li>يمكنك حذف أي ملصق أضفته في أي وقت من داخل التطبيق مباشرة.</li>
+      <li>يمكنك التبليغ عن أي محتوى تراه مخالفًا عبر زر الإبلاغ المتوفر بكل ملصق.</li>
+      <li>لا نبيع بياناتك ولا نشاركها مع أي طرف إعلاني.</li>
+    </ul>
+
+    <h3>خدمات الطرف الثالث</h3>
+    <p>يعتمد AuraPin على: Firebase (Google)، وSupabase، وGoogle Analytics. كل خدمة منها تخضع لسياسة الخصوصية الخاصة بها بشكل مستقل عن هذه الصفحة.</p>
+  </div>
+</section>
+
+<section>
+  <h2>ثانيًا: شروط الاستخدام</h2>
+
+  <div class="card">
+    <h3>قبولك للشروط</h3>
+    <p>باستخدامك تطبيق AuraPin، فإنك توافق على الالتزام بهذه الشروط. إذا كنت لا توافق على أي بند منها، يرجى التوقف عن استخدام التطبيق.</p>
+
+    <h3>الاستخدام المقبول</h3>
+    <ul>
+      <li>يُمنع نشر أي محتوى مسيء أو عنصري أو يحض على الكراهية أو العنف.</li>
+      <li>يُمنع نشر محتوى جنسي أو خادش للحياء العام.</li>
+      <li>يُمنع انتحال شخصية الغير أو نشر معلومات كاذبة أو مضللة.</li>
+      <li>يُمنع استخدام التطبيق لأي غرض غير قانوني.</li>
+      <li>يُمنع محاولة اختراق التطبيق أو تجاوز حدود الاستخدام المفروضة.</li>
+    </ul>
+
+    <h3>المحتوى المخالف</h3>
+    <p>أي ملصق يُبلَّغ عنه ويثبت مخالفته لهذه الشروط قابل للحذف من قِبل إدارة التطبيق دون إشعار مسبق. الإبلاغ المتكرر أو المتعمد بسوء نية قد يؤدي لتقييد الحساب.</p>
+
+    <h3>الملكية والمسؤولية</h3>
+    <ul>
+      <li>أنت المسؤول الوحيد عن أي محتوى تنشره عبر حسابك.</li>
+      <li>التطبيق يُقدَّم "كما هو" دون أي ضمانات، وهو حاليًا في مرحلة تطوير مستمر (MVP)، وقد يحتوي على أخطاء تقنية أو انقطاع مؤقت بالخدمة.</li>
+      <li>لا يتحمل صاحب التطبيق مسؤولية أي ضرر ناتج عن استخدام أو عدم القدرة على استخدام التطبيق.</li>
+    </ul>
+
+    <h3>التعديلات على الشروط</h3>
+    <p>قد تُحدَّث هذه السياسة وشروط الاستخدام من وقت لآخر مع تطور التطبيق. يُنصح بمراجعة هذه الصفحة دوريًا.</p>
+
+    <h3>التواصل</h3>
+    <p>لأي استفسار متعلق بالخصوصية أو شروط الاستخدام، راسلنا عبر: <span class="mono">support.aurapin@gmail.com</span></p>
+  </div>
+</section>
+
+<footer>
+  AuraPin — تطبيق مستقل قيد التطوير · جميع الحقوق محفوظة
+</footer>
+
+</body>
+</html>
