@@ -1,7 +1,7 @@
 /* AuraPin Service Worker — يخزّن هيكل التطبيق (الواجهة) محليًا حتى يفتح بدون اتصال.
    لا يخزّن بيانات الملصقات نفسها (تلك مسؤولية IndexedDB داخل index.html). */
 
-const CACHE_NAME = 'aurapin-shell-v7';
+const CACHE_NAME = 'aurapin-shell-v6';
 const SHELL_FILES = [
   './',
   './index.html',
