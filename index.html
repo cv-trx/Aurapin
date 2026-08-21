@@ -1154,6 +1154,13 @@ async function syncPendingPins(){
         let photoUrl=null,audioUrl=null;
         if(item.type==='photo' && item.photoBlob){
           photoUrl=await uploadPhotoToSupabase(item.photoBlob);
+          const imgOk=await checkImageModeration(photoUrl);
+          if(!imgOk){
+            await deletePendingPin(item.localId);
+            updatePendingBadge();
+            toast('⚠ ملصق معلَّق (صورة) رُفض بسبب محتوى غير مسموح','error');
+            continue;
+          }
         }
         if(item.type==='audio' && item.audioBlob){
           audioUrl=await uploadAudioToSupabase(item.audioBlob);
@@ -1661,6 +1668,22 @@ clearTimeout(timeoutId);
 }
 }
 
+async function checkImageModeration(imageUrl){
+if(!imageUrl) return true;
+const controller=new AbortController();
+const timeoutId=setTimeout(()=>controller.abort(),15000);
+try{
+const res=await fetch(MODERATION_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({imageUrl}),signal:controller.signal});
+if(!res.ok) return false;
+const data=await res.json();
+return !!data.allowed;
+}catch(e){
+return false; // fail-closed: أي فشل أو بطء (حتى 15 ثانية، فحص الصور أبطأ من النص) = رفض الصورة
+}finally{
+clearTimeout(timeoutId);
+}
+}
+
 async function saveTextPin(){
 if(isSaving)return;
 const t=document.getElementById('txt').value.trim();
@@ -1755,6 +1778,8 @@ const photoUrl=await uploadPhotoToSupabase(addFlowFile, (pct)=>{
   progBar.style.setProperty('--pct',pct+'%');
   progTxt.textContent=pct+'%';
 });
+const modOk=await checkImageModeration(photoUrl);
+if(!modOk){ toast('⚠ تعذّر نشر هذه الصورة','error'); return; }
 await window._addPinWithRateLimit({type:'photo',photoUrl,text:caption,private:isPrivatePhoto,lat,lng,ts:Date.now()});
 recordPrivacyChoice(isPrivatePhoto);
 toast('✓ تم حفظ الملصق!','success');
