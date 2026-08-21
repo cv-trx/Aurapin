@@ -1140,7 +1140,7 @@ async function syncPendingPins(){
     let items=await getAllPendingPins();
     if(!items.length) return;
     toast('🔄 جاري إرسال '+items.length+' ملصق معلَّق...','info');
-for(const item of items){
+    for(const item of items){
       try{
         if(item.type==='text'){
           const modOk=await checkModeration(item.text||'');
@@ -1555,18 +1555,24 @@ function quickClickGuard(){
   localStorage.setItem(attemptKey,String(attempts+1));
   return true;
 }
+
 const MODERATION_URL='https://aurapin-moderation.ksajfa2006.workers.dev';
 async function checkModeration(text){
 if(!text) return true;
+const controller=new AbortController();
+const timeoutId=setTimeout(()=>controller.abort(),8000);
 try{
-const res=await fetch(MODERATION_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text})});
+const res=await fetch(MODERATION_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text}),signal:controller.signal});
 if(!res.ok) return false;
 const data=await res.json();
 return !!data.allowed;
 }catch(e){
-return false; // fail-closed: أي فشل بالاتصال بالـ Worker = رفض الملصق
+return false; // fail-closed: أي فشل أو بطء بالاتصال بالـ Worker (حتى 8 ثوانٍ) = رفض الملصق
+}finally{
+clearTimeout(timeoutId);
 }
 }
+
 async function saveTextPin(){
 if(isSaving)return;
 const t=document.getElementById('txt').value.trim();
