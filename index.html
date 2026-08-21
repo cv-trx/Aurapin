@@ -226,7 +226,7 @@ setTimeout(function(){
         <span id="gps-txt">جاري التحديد...</span>
       </div>
       <span id="acc-txt"></span>
-      <span id="offline-indicator" onclick="syncPendingPins()"></span>
+      <span id="offline-indicator" onclick="openPendingList()"></span>
     </div>
   </div>
 
@@ -1199,6 +1199,94 @@ async function updatePendingBadge(){
     }
   }catch(e){}
 }
+
+/* ══════════════════════════════
+   عرض/تعديل/حذف الملصقات المعلَّقة (Offline) قبل الإرسال —
+   النص قابل للتعديل، الصور/الصوت قابلة للحذف فقط (بدون تعديل المحتوى نفسه)
+══════════════════════════════ */
+async function openPendingList(){
+  openSidebar();
+  renderPendingList();
+}
+window.openPendingList=openPendingList;
+
+async function renderPendingList(){
+  const wrap=document.getElementById('sb-panel-content');
+  const items=await getAllPendingPins();
+  if(!items.length){
+    wrap.innerHTML='<div class="sb-label" style="margin-top:18px">الملصقات المعلَّقة</div><div class="sb-list-empty">لا توجد ملصقات بانتظار الإرسال 📍</div>';
+    return;
+  }
+  wrap.innerHTML='<div class="sb-label" style="margin-top:18px">الملصقات المعلَّقة ('+items.length+')</div>'+
+  '<button class="panel-cancel" style="margin:0 0 12px" onclick="syncPendingPins()">🔄 إرسال الآن</button>'+
+  items.map(renderPendingItem).join('');
+}
+
+function renderPendingItem(item){
+  const preview = item.type==='photo' && item.photoBlob ? `<img class="sb-pin-thumb" src="${URL.createObjectURL(item.photoBlob)}" alt=""/>`
+    : item.type==='audio' && item.audioBlob ? `<audio class="sb-pin-audio" controls src="${URL.createObjectURL(item.audioBlob)}" style="width:100%;margin-bottom:8px"></audio>`
+    : '';
+  const textDisplay = `<div class="sb-pin-text">${escHtml(item.text||(item.type==='photo'?'📷 صورة':item.type==='audio'?'🎙️ تسجيل صوتي':''))}</div>`;
+  const editBtn = item.type==='text' ? `<span class="sb-pin-report" onclick="editPendingPin(${item.localId})">✏️ تعديل</span>` : '';
+  return `<div class="sb-pin-row" id="pending-row-${item.localId}">
+    ${preview}
+    ${textDisplay}
+    <div class="sb-pin-meta">${item.private?'🔒 خاص • ':''}بانتظار الإرسال</div>
+    ${editBtn}
+    <span class="sb-pin-del" onclick="deletePendingPinUI(${item.localId})">🗑 حذف</span>
+  </div>`;
+}
+
+async function editPendingPin(localId){
+  const items=await getAllPendingPins();
+  const item=items.find(x=>x.localId===localId);
+  if(!item)return;
+  const row=document.getElementById('pending-row-'+localId);
+  row.innerHTML=`
+    <input type="text" id="pending-edit-input-${localId}" value="${escHtml(item.text||'')}" maxlength="120"
+      style="width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-family:var(--body);font-size:13px;color:var(--paper);text-align:right;margin-bottom:8px;box-sizing:border-box"/>
+    <div style="display:flex;gap:8px">
+      <span class="sb-pin-del" onclick="savePendingEdit(${localId})" style="color:var(--neon-green)">✓ حفظ</span>
+      <span class="sb-pin-del" onclick="renderPendingList()">إلغاء</span>
+    </div>`;
+}
+window.editPendingPin=editPendingPin;
+
+async function savePendingEdit(localId){
+  const input=document.getElementById('pending-edit-input-'+localId);
+  const newText=input.value.trim();
+  if(!newText)return toast('لا يمكن ترك الملصق فارغًا','error');
+  await updatePendingPinText(localId,newText);
+  toast('✓ تم تحديث الملصق','success');
+  renderPendingList();
+}
+window.savePendingEdit=savePendingEdit;
+
+function updatePendingPinText(localId,newText){
+  return openPendingDB().then(db=>new Promise((resolve,reject)=>{
+    const tx=db.transaction(PENDING_STORE,'readwrite');
+    const store=tx.objectStore(PENDING_STORE);
+    const getReq=store.get(localId);
+    getReq.onsuccess=()=>{
+      const record=getReq.result;
+      if(!record){ resolve(); return; }
+      record.text=newText;
+      const putReq=store.put(record);
+      putReq.onsuccess=()=>resolve();
+      putReq.onerror=()=>reject(putReq.error);
+    };
+    getReq.onerror=()=>reject(getReq.error);
+  }));
+}
+
+async function deletePendingPinUI(localId){
+  if(!confirm('هل أنت متأكد من حذف هذا الملصق المعلَّق؟'))return;
+  await deletePendingPin(localId);
+  updatePendingBadge();
+  toast('✓ تم حذف الملصق المعلَّق','success');
+  renderPendingList();
+}
+window.deletePendingPinUI=deletePendingPinUI;
 
 window.addEventListener('online', ()=>{
   toast('✓ عاد الاتصال بالإنترنت','success');
